@@ -80,7 +80,12 @@ function updatePreview() {
         reader.onload = function (e) {
             imagePreviewContainer.innerHTML = "";
 
-            const canvas = document.createElement("canvas");
+            let canvas = document.getElementById("preview-canvas");
+            if (!canvas) {
+                canvas = document.createElement("canvas");
+                canvas.id = "preview-canvas";
+                imagePreviewContainer.appendChild(canvas);
+            }
             const ctx = canvas.getContext("2d", { alpha: true });
             const img = new Image();
 
@@ -118,8 +123,6 @@ function updatePreview() {
 
                 // Draw image
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                imagePreviewContainer.appendChild(canvas);
             };
 
             img.src = e.target.result;
