@@ -165,3 +165,30 @@ cornerBoxes.forEach((box) => {
 });
 
 updateBackgroundColorVisibility();
+
+function updateRoundingLimit() {
+    if (currentUnit === "%") {
+        roundingInput.max = "50";
+        if (parseInt(roundingInput.value) > 50) {
+            roundingInput.value = "50";
+        }
+    } else {
+        roundingInput.max = ""; // Remove max limit for px and em
+    }
+    updatePreview();
+}
+
+// Update event listeners
+switchBtns.forEach((btn) => {
+    btn.addEventListener("click", (event) => {
+        handleUnitSwitch(event);
+        updateRoundingLimit();
+    });
+});
+
+roundingInput.addEventListener("input", (event) => {
+    if (currentUnit === "%" && parseInt(event.target.value) > 50) {
+        event.target.value = "50";
+    }
+    updatePreview();
+});
