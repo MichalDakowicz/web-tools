@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Image Corner Rounder</title>
+        <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" href="rounder.css" />
+    </head>
+    <body>
+        <div class="container">
+            <h1>Image Corner Rounder</h1>
+            <div id="file-input">
+                <input type="file" id="file" accept="image/*" />
+                <label for="file">Choose an image file</label>
+                <p
+                    id="file-name"
+                    style="display: inline-block; margin-left: 10px"
+                ></p>
+                <img
+                    id="file-preview"
+                    src=""
+                    alt="Image preview"
+                    style="
+                        display: none;
+                        max-width: 50px;
+                        max-height: 50px;
+                        margin-left: 10px;
+                    "
+                />
+            </div>
+            <div class="tool-container">
+                <div id="image-preview"></div>
+                <div id="options">
+                    <div>
+                        <div class="switch-group">
+                            <button class="switch-btn active" data-unit="%">
+                                %
+                            </button>
+                            <button class="switch-btn" data-unit="px">
+                                px
+                            </button>
+                            <button class="switch-btn" data-unit="em">
+                                em
+                            </button>
+                        </div>
+                        <div class="rounding-controls">
+                            <input
+                                type="number"
+                                id="rounding"
+                                value="50"
+                                min="0"
+                            />
+                            <div class="corner-toggle">
+                                <div
+                                    class="corner-box tl active"
+                                    data-corner="top-left"
+                                ></div>
+                                <div
+                                    class="corner-box tr active"
+                                    data-corner="top-right"
+                                ></div>
+                                <div
+                                    class="corner-box bl active"
+                                    data-corner="bottom-left"
+                                ></div>
+                                <div
+                                    class="corner-box br active"
+                                    data-corner="bottom-right"
+                                ></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <input type="color" id="color" value="#000000" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="save-container">
+                            <select id="file-type">
+                                <option value="png">PNG</option>
+                                <option value="jpeg">JPEG</option>
+                                <option value="webp">WEBP</option>
+                            </select>
+                            <button id="save">Round</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="darkMode">
+            <input type="checkbox" id="dark-mode-toggle" />
+            <b>Dark Mode</b>
+        </div>
+    </body>
+    <script src="script.js"></script>
+    <script src="rounder.js"></script>
+</html>
