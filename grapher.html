@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Graph Visualizer</title>
+        <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" href="grapher.css" />
+    </head>
+    <body>
+        <div class="container">
+            <div id="graph-input">
+                <div id="latex-preview"></div>
+                <input
+                    type="text"
+                    id="equation"
+                    placeholder="Enter an equation"
+                />
+                <button id="graph-btn">Graph</button>
+
+                <canvas id="graph"> </canvas>
+            </div>
+            <div id="graph"></div>
+        </div>
+
+        <div id="darkMode">
+            <input type="checkbox" id="dark-mode-toggle" />
+            <b>Dark Mode</b>
+        </div>
+    </body>
+    <script src="script.js"></script>
+    <script src="grapher.js"></script>
+</html>
