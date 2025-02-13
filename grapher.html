@@ -6,20 +6,37 @@
         <title>Graph Visualizer</title>
         <link rel="stylesheet" href="style.css" />
         <link rel="stylesheet" href="grapher.css" />
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script
+            id="MathJax-script"
+            async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+        ></script>
     </head>
     <body>
         <div class="container">
             <div id="graph-input">
                 <div class="controls">
-                    <div id="latex-preview"></div>
-                    <input
-                        type="text"
-                        id="equation"
-                        placeholder="Enter equation (e.g., x^2 or Math.sin(x))"
-                    />
-                    <button id="graph-btn">Add Graph</button>
-                    <div class="zoom-info">
-                        <small>Use mouse wheel to zoom, drag to pan</small>
+                    <div id="latex-preview" class="latex-preview"></div>
+                    <div class="input-group">
+                        <input
+                            type="text"
+                            id="equation"
+                            placeholder="Enter LaTeX equation (e.g., x^2 or \sin(x))"
+                        />
+                        <button id="graph-btn">Add Graph</button>
+                    </div>
+                    <div
+                        id="error-display"
+                        style="color: red; min-height: 1.2em"
+                    ></div>
+                    <div class="controls-bottom">
+                        <div class="zoom-info">
+                            <small>Use mouse wheel to zoom, drag to pan</small>
+                        </div>
+                        <button id="save-image" title="Save as PNG">
+                            📷 Save Image
+                        </button>
                     </div>
                 </div>
                 <canvas id="graph"></canvas>
@@ -28,6 +45,22 @@
             <div id="darkMode">
                 <input type="checkbox" id="dark-mode-toggle" />
                 <label for="dark-mode-toggle">Dark Mode</label>
+            </div>
+        </div>
+
+        <div id="edit-modal" class="modal">
+            <div class="modal-content">
+                <h2>Edit Function</h2>
+                <div id="edit-preview" class="latex-preview"></div>
+                <input
+                    type="text"
+                    id="edit-equation"
+                    placeholder="Enter LaTeX equation"
+                />
+                <div class="modal-buttons">
+                    <button id="save-edit">Save</button>
+                    <button id="cancel-edit">Cancel</button>
+                </div>
             </div>
         </div>
     </body>

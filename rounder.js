@@ -48,7 +48,6 @@ fileInput.addEventListener("change", function (event) {
     }
 });
 
-// Update the calculateRadius function to properly handle percentage calculations.
 function calculateRadius(value, width, height) {
     if (currentUnit === "px") {
         return { x: parseInt(value), y: parseInt(value) };
@@ -57,7 +56,6 @@ function calculateRadius(value, width, height) {
         const yVal = (parseInt(value) / 100) * height;
         return { x: xVal, y: yVal };
     } else {
-        // em
         return { x: parseInt(value) * 16, y: parseInt(value) * 16 };
     }
 }
@@ -105,13 +103,11 @@ function updatePreview() {
                               canvas.height
                           ).x;
 
-                // Draw background only for JPEG
                 if (fileTypeSelect.value === "jpeg") {
                     ctx.fillStyle = colorInput.value;
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                 }
 
-                // Create and apply clipping path
                 const path = new Path2D();
                 path.roundRect(0, 0, canvas.width, canvas.height, [
                     activeCorners["top-left"] ? radius : 0,
@@ -121,7 +117,6 @@ function updatePreview() {
                 ]);
                 ctx.clip(path);
 
-                // Draw image
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             };
 
@@ -146,7 +141,6 @@ function saveImage() {
     const previewCanvas = imagePreviewContainer.querySelector("canvas");
     if (!previewCanvas) return;
 
-    // Use the preview canvas directly since it already has the correct rendering
     const link = document.createElement("a");
     const fileName = fileNameDisplay.textContent || "-rounded";
     link.download = `${fileName}.${fileTypeSelect.value}`;
@@ -176,12 +170,11 @@ function updateRoundingLimit() {
             roundingInput.value = "50";
         }
     } else {
-        roundingInput.max = ""; // Remove max limit for px and em
+        roundingInput.max = "";
     }
     updatePreview();
 }
 
-// Update event listeners
 switchBtns.forEach((btn) => {
     btn.addEventListener("click", (event) => {
         handleUnitSwitch(event);

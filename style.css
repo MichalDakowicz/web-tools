@@ -127,7 +127,6 @@ body.dark-mode select {
     border-color: var(--border-color);
 }
 
-/* Media Queries */
 @media screen and (max-width: 600px) {
     .container {
         padding: 10px;

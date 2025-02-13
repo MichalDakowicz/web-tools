@@ -280,7 +280,6 @@ img {
     margin: 0 !important;
 }
 
-/* Add responsive layout */
 @media screen and (max-width: 768px) {
     .tool-container {
         flex-direction: column;

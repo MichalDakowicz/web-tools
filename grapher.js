@@ -1,90 +1,106 @@
-const canvas = document.getElementById('graph');
-const ctx = canvas.getContext('2d');
-const equation = document.getElementById('equation');
-const graphBtn = document.getElementById('graph-btn');
+const canvas = document.getElementById("graph");
+const ctx = canvas.getContext("2d");
+const equation = document.getElementById("equation");
+const graphBtn = document.getElementById("graph-btn");
 
-// Set canvas size
 canvas.width = 600;
 canvas.height = 400;
 
-// Graph settings
-const xScale = 50; // pixels per unit
+const xScale = 50;
 const yScale = 50;
 const xOffset = canvas.width / 2;
 const yOffset = canvas.height / 2;
 
-// Add new graph settings
 let zoom = 1;
 let panX = 0;
 let panY = 0;
 let isDragging = false;
 let lastX = 0;
 let lastY = 0;
-// Adjust colors array for better visibility in dark mode
-const colors = [
-    '#ff6666',   // Brighter red
-    '#66ff66',   // Brighter green
-    '#6666ff',   // Brighter blue
-    '#ff66ff',   // Brighter magenta
-    '#66ffff'    // Brighter cyan
-];
+const colors = ["#ff6666", "#66ff66", "#6666ff", "#ff66ff", "#66ffff"];
 let functions = [];
 
+function latexToJavaScript(latex) {
+    let prevLatex;
+    do {
+        prevLatex = latex;
+
+        latex = latex
+            .replace(/\\sin\{([^{}]+)\}/g, "Math.sin($1)")
+            .replace(/\\cos\{([^{}]+)\}/g, "Math.cos($1)")
+            .replace(/\\tan\{([^{}]+)\}/g, "Math.tan($1)")
+            .replace(/\\sqrt\{([^{}]+)\}/g, "Math.sqrt($1)")
+            .replace(/\\exp\{([^{}]+)\}/g, "Math.exp($1)")
+            .replace(/\\ln\{([^{}]+)\}/g, "Math.log($1)")
+            .replace(/\\log\{([^{}]+)\}/g, "Math.log10($1)");
+
+        latex = latex.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, "(($1)/($2))");
+    } while (latex !== prevLatex);
+
+    return latex
+        .replace(/\\pi/g, "Math.PI")
+        .replace(/\\sin\(/g, "Math.sin(")
+        .replace(/\\cos\(/g, "Math.cos(")
+        .replace(/\\tan\(/g, "Math.tan(")
+        .replace(/\\sqrt\(/g, "Math.sqrt(")
+        .replace(/\\exp\(/g, "Math.exp(")
+        .replace(/\\ln\(/g, "Math.log(")
+        .replace(/\\log\(/g, "Math.log10(");
+}
+
+function updateLatexPreview(latex) {
+    const preview = document.getElementById("latex-preview");
+    preview.innerHTML = `\\[${latex}\\]`;
+    MathJax.typesetPromise([preview]);
+}
+
 function drawGridLabels() {
-    ctx.font = '12px Arial';
-    ctx.fillStyle = document.body.classList.contains('dark-mode') ? '#fff' : '#000';
-    
-    // X-axis labels
-    for (let x = -Math.floor(canvas.width/xScale/2); x <= Math.floor(canvas.width/xScale/2); x++) {
+    ctx.font = "12px Arial";
+    ctx.fillStyle = document.body.classList.contains("dark-mode")
+        ? "#fff"
+        : "#000";
+
+    for (
+        let x = -Math.floor(canvas.width / xScale / 2);
+        x <= Math.floor(canvas.width / xScale / 2);
+        x++
+    ) {
         const pixelX = x * xScale * zoom + xOffset + panX;
         ctx.fillText(x.toString(), pixelX, yOffset + 20);
     }
-    
-    // Y-axis labels
-    for (let y = -Math.floor(canvas.height/yScale/2); y <= Math.floor(canvas.height/yScale/2); y++) {
+
+    for (
+        let y = -Math.floor(canvas.height / yScale / 2);
+        y <= Math.floor(canvas.height / yScale / 2);
+        y++
+    ) {
         const pixelY = -y * yScale * zoom + yOffset + panY;
         ctx.fillText(y.toString(), xOffset - 20, pixelY);
     }
 }
 
 function calculateGridSpacing(zoom) {
-    // Base grid spacing of 50 pixels
     const baseSpacing = 50;
     const unitSize = baseSpacing * zoom;
-    
-    // More steps for zoomed in view, fewer for zoomed out
+
     const spacingSteps = [
-        0.1, 0.2, 0.25,  // More granular steps when zoomed in
-        0.5,
-        1, 2, 2.5,      // Additional intermediate steps
-        5,
-        10, 25,         // Tens
-        50,
-        100, 250,       // Hundreds
-        500,
-        1000, 2500,     // Thousands
-        5000,
-        10000, 25000,   // Ten thousands
-        50000,
-        100000          // Max value
+        0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 25, 50, 100, 250, 500, 1000,
+        2500, 5000, 10000, 25000, 50000, 100000,
     ];
-    
-    // Find appropriate spacing with different thresholds for zooming in/out
+
     let spacing = spacingSteps[0];
     for (let step of spacingSteps) {
-        // Use smaller minimum spacing when zoomed in (zoom > 1)
         const minSpacing = zoom > 1 ? 40 : 60;
         if (step * unitSize >= minSpacing) {
             break;
         }
         spacing = step;
     }
-    
+
     return spacing;
 }
 
 function formatNumber(num) {
-    // Simple fixed decimal formatting, no scientific notation
     if (Math.abs(num) >= 1) {
         return Number(num.toFixed(0));
     }
@@ -92,22 +108,18 @@ function formatNumber(num) {
 }
 
 function drawGrid() {
-    const isDark = document.body.classList.contains('dark-mode');
-    // Lighter grid lines for dark mode
-    ctx.strokeStyle = isDark ? '#444' : '#ddd';
+    const isDark = document.body.classList.contains("dark-mode");
+    ctx.strokeStyle = isDark ? "#444" : "#ddd";
     ctx.lineWidth = 1;
 
-    // Calculate adaptive grid spacing
     const spacing = calculateGridSpacing(zoom);
     const pixelSpacing = spacing * xScale * zoom;
-    
-    // Calculate visible range
-    const startX = Math.floor((-panX - canvas.width/2) / (pixelSpacing));
-    const endX = Math.ceil((-panX + canvas.width/2) / (pixelSpacing));
-    const startY = Math.floor((-panY - canvas.height/2) / (pixelSpacing));
-    const endY = Math.ceil((-panY + canvas.height/2) / (pixelSpacing));
 
-    // Draw vertical lines
+    const startX = Math.floor((-panX - canvas.width / 2) / pixelSpacing);
+    const endX = Math.ceil((-panX + canvas.width / 2) / pixelSpacing);
+    const startY = Math.floor((-panY - canvas.height / 2) / pixelSpacing);
+    const endY = Math.ceil((-panY + canvas.height / 2) / pixelSpacing);
+
     for (let i = startX; i <= endX; i++) {
         const x = i * pixelSpacing + panX + xOffset;
         ctx.beginPath();
@@ -116,7 +128,6 @@ function drawGrid() {
         ctx.stroke();
     }
 
-    // Draw horizontal lines
     for (let i = startY; i <= endY; i++) {
         const y = i * pixelSpacing + panY + yOffset;
         ctx.beginPath();
@@ -125,26 +136,22 @@ function drawGrid() {
         ctx.stroke();
     }
 
-    // Brighter axes for dark mode
-    ctx.strokeStyle = isDark ? '#666' : '#000';
+    ctx.strokeStyle = isDark ? "#666" : "#000";
     ctx.lineWidth = 2;
-    
-    // X-axis
+
     ctx.beginPath();
     ctx.moveTo(0, yOffset + panY);
     ctx.lineTo(canvas.width, yOffset + panY);
     ctx.stroke();
 
-    // Y-axis
     ctx.beginPath();
     ctx.moveTo(xOffset + panX, 0);
     ctx.lineTo(xOffset + panX, canvas.height);
     ctx.stroke();
 
-    // Brighter text for dark mode
-    ctx.font = '12px Arial';
-    ctx.fillStyle = isDark ? '#888' : '#000';
-    
+    ctx.font = "12px Arial";
+    ctx.fillStyle = isDark ? "#888" : "#000";
+
     for (let i = startX; i <= endX; i++) {
         const x = i * pixelSpacing + panX + xOffset;
         const value = formatNumber(i * spacing);
@@ -159,20 +166,24 @@ function drawGrid() {
 }
 
 function prepareMathExpression(expr) {
-    // Replace ^ with ** for exponentiation
-    return expr.replace(/\^/g, '**');
+    return expr.replace(/\^/g, "**");
 }
 
-function plotFunction(equation, color) {
+function plotFunction(latex, color) {
+    const errorDisplay = document.getElementById("error-display");
+    if (errorDisplay) {
+        errorDisplay.textContent = "";
+    }
+
     ctx.beginPath();
     ctx.strokeStyle = color;
     ctx.lineWidth = 2;
 
     try {
-        const processedEquation = prepareMathExpression(equation);
+        const jsEquation = latexToJavaScript(latex);
         for (let pixelX = 0; pixelX < canvas.width; pixelX++) {
-            const x = ((pixelX - xOffset - panX) / xScale / zoom);
-            const result = eval(processedEquation.replace(/x/g, `(${x})`));
+            const x = (pixelX - xOffset - panX) / xScale / zoom;
+            const result = eval(jsEquation.replace(/x/g, `(${x})`));
             const y = -result * yScale * zoom + yOffset + panY;
 
             if (pixelX === 0) {
@@ -183,7 +194,10 @@ function plotFunction(equation, color) {
         }
         ctx.stroke();
     } catch (error) {
-        console.error('Invalid equation:', error);
+        console.error("Invalid equation:", error);
+        if (errorDisplay) {
+            errorDisplay.textContent = "Error in equation: " + error.message;
+        }
     }
 }
 
@@ -195,26 +209,24 @@ function redrawGraph() {
     });
 }
 
-// Event listeners for zoom and pan
-canvas.addEventListener('wheel', (e) => {
+canvas.addEventListener("wheel", (e) => {
     e.preventDefault();
-    const zoomFactor = e.deltaY > 0 ? 0.95 : 1.05; // More gradual zoom
+    const zoomFactor = e.deltaY > 0 ? 0.95 : 1.05;
     const newZoom = zoom * zoomFactor;
-    
-    // Limit zoom range to prevent floating point issues
+
     if (newZoom > 0.000001 && newZoom < 1000000) {
         zoom = newZoom;
         redrawGraph();
     }
 });
 
-canvas.addEventListener('mousedown', (e) => {
+canvas.addEventListener("mousedown", (e) => {
     isDragging = true;
     lastX = e.clientX;
     lastY = e.clientY;
 });
 
-canvas.addEventListener('mousemove', (e) => {
+canvas.addEventListener("mousemove", (e) => {
     if (isDragging) {
         panX += e.clientX - lastX;
         panY += e.clientY - lastY;
@@ -224,62 +236,106 @@ canvas.addEventListener('mousemove', (e) => {
     }
 });
 
-canvas.addEventListener('mouseup', () => {
+canvas.addEventListener("mouseup", () => {
     isDragging = false;
 });
 
-graphBtn.addEventListener('click', () => {
+graphBtn.addEventListener("click", () => {
     const func = equation.value;
     if (func) {
         functions.push(func);
-        equation.value = '';
+        equation.value = "";
         redrawGraph();
         updateFunctionList();
     }
 });
 
-// Add function management
 function updateFunctionList() {
-    const list = document.getElementById('function-list');
-    list.innerHTML = '';
-    
+    const list = document.getElementById("function-list");
+    list.innerHTML = "";
+
     functions.forEach((func, index) => {
-        const div = document.createElement('div');
-        div.className = 'function-item';
-        
-        const colorBox = document.createElement('div');
-        colorBox.className = 'color-indicator';
+        const div = document.createElement("div");
+        div.className = "function-item";
+
+        const colorBox = document.createElement("div");
+        colorBox.className = "color-indicator";
         colorBox.style.backgroundColor = colors[index % colors.length];
-        
-        const text = document.createElement('span');
-        text.textContent = func;
-        
-        const editBtn = document.createElement('button');
-        editBtn.textContent = '✎';
-        editBtn.className = 'edit-btn';
-        editBtn.onclick = () => editFunction(index);
-        
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = '×';
-        deleteBtn.className = 'remove-btn';
-        deleteBtn.onclick = () => deleteFunction(index);
-        
+
+        const text = document.createElement("div");
+        text.className = "latex-equation";
+        text.innerHTML = `\\[${func}\\]`;
+
+        const editSection = document.createElement("div");
+        editSection.className = "edit-section";
+        editSection.innerHTML = "✎";
+        editSection.onclick = () => editFunction(index);
+
+        const removeSection = document.createElement("div");
+        removeSection.className = "remove-section";
+        removeSection.innerHTML = "×";
+        removeSection.onclick = () => deleteFunction(index);
+
         div.appendChild(colorBox);
         div.appendChild(text);
-        div.appendChild(editBtn);
-        div.appendChild(deleteBtn);
+        div.appendChild(editSection);
+        div.appendChild(removeSection);
         list.appendChild(div);
     });
+
+    MathJax.typesetPromise();
 }
 
+let editingIndex = -1;
+const editModal = document.getElementById("edit-modal");
+const editEquation = document.getElementById("edit-equation");
+const saveEditBtn = document.getElementById("save-edit");
+const cancelEditBtn = document.getElementById("cancel-edit");
+
 function editFunction(index) {
-    const newFunc = prompt('Edit function:', functions[index]);
-    if (newFunc !== null) {
-        functions[index] = newFunc;
+    editingIndex = index;
+    editEquation.value = functions[index];
+    editModal.classList.add("active");
+    updateEditPreview(functions[index]);
+}
+
+function updateEditPreview(latex) {
+    const preview = document.getElementById("edit-preview");
+    preview.innerHTML = `\\[${latex}\\]`;
+    MathJax.typesetPromise([preview]);
+}
+
+editEquation.addEventListener("input", (e) => {
+    updateEditPreview(e.target.value);
+});
+
+saveEditBtn.addEventListener("click", () => {
+    if (editingIndex !== -1) {
+        functions[editingIndex] = editEquation.value;
+        editModal.classList.remove("active");
         redrawGraph();
         updateFunctionList();
     }
-}
+});
+
+cancelEditBtn.addEventListener("click", () => {
+    editModal.classList.remove("active");
+});
+
+editModal.addEventListener("click", (e) => {
+    if (e.target === editModal) {
+        editModal.classList.remove("active");
+    }
+});
+
+editEquation.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+        saveEditBtn.click();
+    }
+    if (e.key === "Escape") {
+        cancelEditBtn.click();
+    }
+});
 
 function deleteFunction(index) {
     functions.splice(index, 1);
@@ -287,18 +343,142 @@ function deleteFunction(index) {
     updateFunctionList();
 }
 
-// Add keyboard support
-equation.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
+equation.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
         graphBtn.click();
     }
 });
 
-// Dark mode toggle
-document.getElementById('dark-mode-toggle').addEventListener('change', (e) => {
-    document.body.classList.toggle('dark-mode', e.target.checked);
+equation.addEventListener("input", (e) => {
+    updateLatexPreview(e.target.value);
+});
+
+document.getElementById("dark-mode-toggle").addEventListener("change", (e) => {
+    document.body.classList.toggle("dark-mode", e.target.checked);
     redrawGraph();
 });
 
-// Initial draw
+async function drawLegend(ctx, functions, colors) {
+    const tempDiv = document.createElement("div");
+    tempDiv.style.position = "absolute";
+    tempDiv.style.left = "-9999px";
+    tempDiv.style.backgroundColor = document.body.classList.contains(
+        "dark-mode"
+    )
+        ? "#444"
+        : "#f8f8f8";
+    tempDiv.style.padding = "20px";
+    document.body.appendChild(tempDiv);
+
+    const renderedEquations = [];
+    for (const func of functions) {
+        const eqDiv = document.createElement("div");
+        eqDiv.style.display = "inline-block";
+        eqDiv.style.color = document.body.classList.contains("dark-mode")
+            ? "#fff"
+            : "#000";
+        eqDiv.innerHTML = `\\[${func}\\]`;
+        tempDiv.appendChild(eqDiv);
+        renderedEquations.push(eqDiv);
+    }
+
+    await MathJax.typesetPromise();
+
+    const padding = 5; 
+    const lineHeight = 25;
+    const boxWidth = 15;
+    const boxPadding = 5;
+
+    let maxWidth = 0;
+    let maxHeight = 0;
+    renderedEquations.forEach((eq) => {
+        const mjxContainer = eq.querySelector(".MathJax");
+        if (mjxContainer) {
+            maxWidth = Math.max(maxWidth, mjxContainer.offsetWidth);
+            maxHeight = Math.max(maxHeight, mjxContainer.offsetHeight);
+        }
+    });
+
+    const legendWidth = maxWidth + boxWidth + padding * 8;
+    const legendHeight = functions.length * lineHeight + padding * 2;
+
+    const isDark = document.body.classList.contains("dark-mode");
+    ctx.fillStyle = isDark ? "#444" : "#f8f8f8";
+    ctx.strokeStyle = isDark ? "#666" : "#ccc";
+    ctx.lineWidth = 1;
+
+    ctx.beginPath();
+    ctx.roundRect(padding, padding, legendWidth, legendHeight, 5);
+    ctx.fill();
+    ctx.stroke();
+
+    for (let i = 0; i < functions.length; i++) {
+        const yCenter = padding + i * lineHeight + lineHeight / 2;
+
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fillRect(padding * 2, yCenter - boxWidth / 2, boxWidth, boxWidth);
+
+        const container = renderedEquations[i].querySelector(".MathJax");
+        if (container) {
+            container.style.color = isDark ? "#fff" : "#000";
+            const xml = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="${
+                    container.offsetWidth
+                }" height="${container.offsetHeight}">
+                    <foreignObject width="100%" height="100%">
+                        <div xmlns="http://www.w3.org/1999/xhtml">
+                            <style>
+                                .mjx-math, .mjx-chtml { color: ${
+                                    isDark ? "#fff" : "#000"
+                                } !important; }
+                            </style>
+                            ${container.outerHTML}
+                        </div>
+                    </foreignObject>
+                </svg>
+            `;
+
+            const img = new Image();
+            await new Promise((resolve) => {
+                img.onload = resolve;
+                img.src =
+                    "data:image/svg+xml;base64," +
+                    btoa(unescape(encodeURIComponent(xml)));
+            });
+
+            ctx.drawImage(
+                img,
+                padding * 3 + boxWidth,
+                yCenter - img.height / 2
+            );
+        }
+    }
+
+    document.body.removeChild(tempDiv);
+}
+
+document.getElementById("save-image").addEventListener("click", async () => {
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    const tempCtx = tempCanvas.getContext("2d");
+
+    tempCtx.fillStyle = document.body.classList.contains("dark-mode")
+        ? "#333"
+        : "#fff";
+    tempCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+    tempCtx.drawImage(canvas, 0, 0);
+
+    if (functions.length > 0) {
+        await drawLegend(tempCtx, functions, colors);
+    }
+
+    const link = document.createElement("a");
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    link.download = `graph-${timestamp}.png`;
+    link.href = tempCanvas.toDataURL("image/png");
+    link.click();
+});
+
 redrawGraph();

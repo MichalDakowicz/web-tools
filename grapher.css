@@ -64,7 +64,8 @@ canvas {
 }
 
 .function-item {
-    display: flex;
+    display: grid;
+    grid-template-columns: 20px 1fr 30px 30px;
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem;
@@ -75,6 +76,41 @@ canvas {
 
 .dark-mode .function-item {
     background-color: rgba(255, 255, 255, 0.05);
+}
+
+.edit-section,
+.remove-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.edit-section {
+    background-color: #4caf50;
+    color: white;
+}
+
+.edit-section:hover {
+    background-color: #45a049;
+}
+
+.remove-section {
+    background-color: #ff4444;
+    color: white;
+}
+
+.remove-section:hover {
+    background-color: #ff3333;
+}
+
+.edit-btn,
+.remove-btn {
+    display: none;
 }
 
 .edit-btn {
@@ -98,4 +134,78 @@ canvas {
 .function-item span {
     flex: 1;
     font-family: monospace;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background-color: var(--background-color);
+    padding: 2rem;
+    border-radius: 8px;
+    min-width: 300px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+#edit-equation {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.modal-buttons button {
+    min-width: 80px;
+}
+
+#cancel-edit {
+    background-color: #666;
+}
+
+#cancel-edit:hover {
+    background-color: #555;
+}
+
+.controls-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+#save-image {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+    background-color: var(--button-bg-color);
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+#save-image:hover {
+    background-color: var(--button-hover-bg-color);
 }
