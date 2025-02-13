@@ -23,3 +23,7 @@
     line-height: 1.5;
     text-align: center;
 }
+
+.uncomplete {
+    filter: brightness(0.8) !important;
+}
