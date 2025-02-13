@@ -135,3 +135,7 @@ body.dark-mode select {
         height: 200px;
     }
 }
+
+.uncomplete {
+    filter: brightness(0.8);
+}
