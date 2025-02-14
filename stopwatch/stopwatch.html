@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Stopwatch</title>
+        <link rel="stylesheet" href="../style.css" />
+        <link rel="stylesheet" href="stopwatch.css" />
+    </head>
+    <body>
+        <div class="container">
+            <h2 id="swDisplay">
+                00<small>m</small> 00<small>s</small> 000<small>ms</small>
+            </h2>
+            <div class="inputs">
+                <input
+                    type="number"
+                    id="swMinutes"
+                    placeholder="Minutes"
+                    min="0"
+                    value="0"
+                />
+                <input
+                    type="number"
+                    id="swSeconds"
+                    placeholder="Seconds"
+                    min="0"
+                    max="59"
+                    value="0"
+                />
+            </div>
+            <div class="stopwatch-buttons">
+                <button id="swStart">Start</button>
+                <button id="swPause">Pause</button>
+                <button id="swReset">Reset</button>
+            </div>
+        </div>
+        <div id="darkMode">
+            <input type="checkbox" id="dark-mode-toggle" />
+            <b>Dark Mode</b>
+        </div>
+        <script src="../script.js"></script>
+        <script src="stopwatch.js"></script>
+    </body>
+</html>

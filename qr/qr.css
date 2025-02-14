@@ -1,0 +1,44 @@
+.container {
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: var(--background-color);
+    margin: 20px auto;
+    max-width: 400px;
+}
+
+#qrInput {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+}
+
+#qrGenerate,
+#downloadQRCode {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--button-bg-color);
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#qrGenerate:hover,
+#downloadQRCode:hover {
+    background-color: var(--button-hover-bg-color);
+}
+
+#qrCode {
+    margin: 20px 0;
+    text-align: center;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px dashed var(--border-color);
+    border-radius: 4px;
+}

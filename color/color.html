@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Color Picker</title>
+        <link rel="stylesheet" href="../style.css" />
+        <link rel="stylesheet" href="color.css" />
+    </head>
+    <body>
+        <div class="container">
+            <label for="colorPicker">Pick a color:</label>
+            <input type="color" id="colorPicker" value="#000000" />
+            <label for="hexInput">Hex:</label>
+            <input
+                type="text"
+                id="hexInput"
+                placeholder="#000000"
+                value="#000000"
+            />
+            <label for="rgbInput">RGB:</label>
+            <input
+                type="text"
+                id="rgbInput"
+                placeholder="rgb(0, 0, 0)"
+                value="rgb(0, 0, 0)"
+            />
+        </div>
+
+        <div id="darkMode">
+            <input type="checkbox" id="dark-mode-toggle" />
+            <b>Dark Mode</b>
+        </div>
+        <script src="../script.js"></script>
+        <script src="color.js"></script>
+    </body>
+</html>
