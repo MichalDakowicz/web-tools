@@ -3,67 +3,164 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Graph Visualizer</title>
+        <title>Advanced LaTeX Grapher</title>
         <link rel="stylesheet" href="../style.css" />
         <link rel="stylesheet" href="grapher.css" />
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+            integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+"
+            crossorigin="anonymous"
+        />
         <script
-            id="MathJax-script"
-            async
-            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+            defer
+            src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
+            integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            defer
+            src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+            integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk"
+            crossorigin="anonymous"
+        ></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.0.3/math.min.js"></script>
+
+        <script
+            src="https://cdn.plot.ly/plotly-2.33.0.min.js"
+            integrity="sha512-kG/veDBO4Av/ffjTdtEvtsUkVgAisp5MWbymAUc5vJlyZb3WSZ+gEC8cNlAACBzaHQQLTUKqRaNIKeIc44yD6w=="
+            crossorigin="anonymous"
         ></script>
     </head>
     <body>
         <div class="container">
-            <div id="graph-input">
-                <div class="controls">
-                    <div id="latex-preview" class="latex-preview"></div>
-                    <div class="input-group">
-                        <input
-                            type="text"
-                            id="equation"
-                            placeholder="Enter LaTeX equation (e.g., x^2 or \sin(x))"
-                        />
-                        <button id="graph-btn">Add Graph</button>
-                    </div>
-                    <div
-                        id="error-display"
-                        style="color: red; min-height: 1.2em"
-                    ></div>
-                    <div class="controls-bottom">
-                        <div class="zoom-info">
-                            <small>Use mouse wheel to zoom, drag to pan</small>
+            <h1>Advanced Function Grapher</h1>
+            <div id="plotError" class="error-message"></div>
+            <div id="plotInfo" class="info-message"></div>
+
+            <div id="controlsWrapper">
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <h3>Graph Settings</h3>
+                        <div class="setting-row">
+                            <label for="xMin">X Min:</label>
+                            <input type="number" id="xMin" value="-10" />
+                            <label for="xMax">X Max:</label>
+                            <input type="number" id="xMax" value="10" />
                         </div>
-                        <button id="save-image" title="Save as PNG">
-                            📷 Save Image
-                        </button>
+                        <div class="setting-row">
+                            <label for="numPoints">Points:</label>
+                            <input
+                                type="number"
+                                id="numPoints"
+                                value="500"
+                                min="2"
+                                max="10000"
+                            />
+                            <label for="useDegrees" class="checkbox-label">
+                                <input type="checkbox" id="useDegrees" /> Use
+                                Degrees
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <h3>Constants <small>(e.g., a=1, b=pi/2)</small></h3>
+                        <textarea
+                            id="constantsInput"
+                            rows="4"
+                            placeholder="b=pi/2"
+                        ></textarea>
                     </div>
                 </div>
-                <canvas id="graph"></canvas>
-                <div id="function-list"></div>
+
+                <div class="control-group">
+                    <h3>Functions <small>(use 'x')</small></h3>
+                    <div id="functionInputs"></div>
+                    <button
+                        id="addFunctionBtn"
+                        class="secondary-button add-func-btn"
+                    >
+                        Add Function
+                    </button>
+                </div>
+
+                <div class="action-buttons-group">
+                    <button id="plotBtn">Plot Functions</button>
+                    <button id="saveImageBtn" class="secondary-button">
+                        Save as PNG
+                    </button>
+                    <button id="copyImageBtn" class="secondary-button">
+                        Copy Image
+                    </button>
+                </div>
             </div>
-            <div id="darkMode">
-                <input type="checkbox" id="dark-mode-toggle" />
-                <label for="dark-mode-toggle">Dark Mode</label>
+
+            <div id="plotArea">
+                <div id="plot"></div>
             </div>
         </div>
 
-        <div id="edit-modal" class="modal">
-            <div class="modal-content">
-                <h2>Edit Function</h2>
-                <div id="edit-preview" class="latex-preview"></div>
+        <div id="darkMode">
+            <input type="checkbox" id="dark-mode-toggle" />
+            <b>Dark Mode</b>
+        </div>
+
+        <script src="grapher.js"></script>
+
+        <script src="../script.js"></script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                if (typeof window.renderMathInElement !== "function") {
+                    window.renderMathInElement = function (elem) {
+                        if (typeof renderMathInElement !== "undefined") {
+                            renderMathInElement(elem, {
+                                delimiters: [
+                                    { left: "$$", right: "$$", display: true },
+                                    { left: "$", right: "$", display: false },
+                                    {
+                                        left: "\\(",
+                                        right: "\\)",
+                                        display: false,
+                                    },
+                                    {
+                                        left: "\\[",
+                                        right: "\\]",
+                                        display: true,
+                                    },
+                                ],
+                                throwOnError: false,
+                            });
+                        } else {
+                            console.warn(
+                                "KaTeX auto-render function not available yet."
+                            );
+                        }
+                    };
+                }
+            });
+        </script>
+
+        <template id="functionInputTemplate">
+            <div class="function-row">
+                <label class="func-label">y = </label>
                 <input
                     type="text"
-                    id="edit-equation"
-                    placeholder="Enter LaTeX equation"
+                    class="function-input"
+                    placeholder="\sin(x) + x^2 / 2"
                 />
-                <div class="modal-buttons">
-                    <button id="save-edit">Save</button>
-                    <button id="cancel-edit">Cancel</button>
-                </div>
+                <span class="rendered-latex" title="LaTeX Preview"></span>
+                <input
+                    type="color"
+                    class="color-input"
+                    value="#1f77b4"
+                    title="Plot color"
+                />
+                <button class="remove-btn" title="Remove function">×</button>
             </div>
-        </div>
+        </template>
     </body>
-    <script src="../script.js"></script>
-    <script src="grapher.js"></script>
 </html>

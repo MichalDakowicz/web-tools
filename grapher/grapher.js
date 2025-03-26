@@ -1,484 +1,455 @@
-const canvas = document.getElementById("graph");
-const ctx = canvas.getContext("2d");
-const equation = document.getElementById("equation");
-const graphBtn = document.getElementById("graph-btn");
-
-canvas.width = 600;
-canvas.height = 400;
-
-const xScale = 50;
-const yScale = 50;
-const xOffset = canvas.width / 2;
-const yOffset = canvas.height / 2;
-
-let zoom = 1;
-let panX = 0;
-let panY = 0;
-let isDragging = false;
-let lastX = 0;
-let lastY = 0;
-const colors = ["#ff6666", "#66ff66", "#6666ff", "#ff66ff", "#66ffff"];
-let functions = [];
-
-function latexToJavaScript(latex) {
-    let prevLatex;
-    do {
-        prevLatex = latex;
-
-        latex = latex
-            .replace(/\\sin\{([^{}]+)\}/g, "Math.sin($1)")
-            .replace(/\\cos\{([^{}]+)\}/g, "Math.cos($1)")
-            .replace(/\\tan\{([^{}]+)\}/g, "Math.tan($1)")
-            .replace(/\\sqrt\{([^{}]+)\}/g, "Math.sqrt($1)")
-            .replace(/\\exp\{([^{}]+)\}/g, "Math.exp($1)")
-            .replace(/\\ln\{([^{}]+)\}/g, "Math.log($1)")
-            .replace(/\\log\{([^{}]+)\}/g, "Math.log10($1)");
-
-        latex = latex.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, "(($1)/($2))");
-    } while (latex !== prevLatex);
-
-    return latex
-        .replace(/\\pi/g, "Math.PI")
-        .replace(/\\sin\(/g, "Math.sin(")
-        .replace(/\\cos\(/g, "Math.cos(")
-        .replace(/\\tan\(/g, "Math.tan(")
-        .replace(/\\sqrt\(/g, "Math.sqrt(")
-        .replace(/\\exp\(/g, "Math.exp(")
-        .replace(/\\ln\(/g, "Math.log(")
-        .replace(/\\log\(/g, "Math.log10(");
+function debounce(func, wait, immediate) {
+    let timeout;
+    return function () {
+        const context = this,
+            args = arguments;
+        const later = function () {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+        };
+        const callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+    };
 }
 
-function updateLatexPreview(latex) {
-    const preview = document.getElementById("latex-preview");
-    preview.innerHTML = `\\[${latex}\\]`;
-    MathJax.typesetPromise([preview]);
-}
+document.addEventListener("DOMContentLoaded", () => {
+    const plotDiv = document.getElementById("plot");
+    const functionInputsContainer = document.getElementById("functionInputs");
+    const addFunctionBtn = document.getElementById("addFunctionBtn");
+    const plotBtn = document.getElementById("plotBtn");
+    const xMinInput = document.getElementById("xMin");
+    const xMaxInput = document.getElementById("xMax");
+    const numPointsInput = document.getElementById("numPoints");
+    const plotErrorDiv = document.getElementById("plotError");
+    const plotInfoDiv = document.getElementById("plotInfo");
+    const functionInputTemplate = document.getElementById(
+        "functionInputTemplate"
+    );
+    const constantsInput = document.getElementById("constantsInput");
+    const saveImageBtn = document.getElementById("saveImageBtn");
+    const copyImageBtn = document.getElementById("copyImageBtn");
+    const darkModeToggle = document.getElementById("dark-mode-toggle");
 
-function drawGridLabels() {
-    ctx.font = "12px Arial";
-    ctx.fillStyle = document.body.classList.contains("dark-mode")
-        ? "#fff"
-        : "#000";
+    const useDegreesCheckbox = document.getElementById("useDegrees");
 
-    for (
-        let x = -Math.floor(canvas.width / xScale / 2);
-        x <= Math.floor(canvas.width / xScale / 2);
-        x++
-    ) {
-        const pixelX = x * xScale * zoom + xOffset + panX;
-        ctx.fillText(x.toString(), pixelX, yOffset + 20);
+    let functionCount = 0;
+
+    const debouncedPlotGraph = debounce(plotGraph, 500);
+
+    function simpleLatexToMathjs(latexStr) {
+        let mathStr = latexStr.trim();
+
+        mathStr = mathStr.replace(/\\sqrt\((.*?)\)/g, "sqrt($1)");
+        mathStr = mathStr.replace(/\\sqrt\{(.*?)\}/g, "sqrt($1)");
+
+        mathStr = mathStr.replace(/\\sin\((.*?)\)/g, "sin($1)");
+        mathStr = mathStr.replace(/\\sin\{(.*?)\}/g, "sin($1)");
+
+        mathStr = mathStr.replace(/\\cos\((.*?)\)/g, "cos($1)");
+        mathStr = mathStr.replace(/\\cos\{(.*?)\}/g, "cos($1)");
+
+        mathStr = mathStr.replace(/\\tan\((.*?)\)/g, "tan($1)");
+        mathStr = mathStr.replace(/\\tan\{(.*?)\}/g, "tan($1)");
+
+        mathStr = mathStr.replace(/\\arcsin\((.*?)\)/g, "asin($1)");
+        mathStr = mathStr.replace(/\\arcsin\{(.*?)\}/g, "asin($1)");
+        mathStr = mathStr.replace(/\\arccos\((.*?)\)/g, "acos($1)");
+        mathStr = mathStr.replace(/\\arccos\{(.*?)\}/g, "acos($1)");
+        mathStr = mathStr.replace(/\\arctan\((.*?)\)/g, "atan($1)");
+        mathStr = mathStr.replace(/\\arctan\{(.*?)\}/g, "atan($1)");
+
+        mathStr = mathStr.replace(/\\ln\((.*?)\)/g, "log($1)");
+        mathStr = mathStr.replace(/\\ln\{(.*?)\}/g, "log($1)");
+        mathStr = mathStr.replace(/\\log_{?(\d+)}?\((.*?)\)/g, "log($2, $1)");
+        mathStr = mathStr.replace(/\\log_{?(\d+)}?\{(.*?)\}/g, "log($2, $1)");
+        mathStr = mathStr.replace(/\\log\((.*?)\)/g, "log($1, 10)");
+        mathStr = mathStr.replace(/\\log\{(.*?)\}/g, "log($1, 10)");
+
+        mathStr = mathStr.replace(/\\exp\((.*?)\)/g, "exp($1)");
+        mathStr = mathStr.replace(/\\exp\{(.*?)\}/g, "exp($1)");
+
+        mathStr = mathStr.replace(/\\abs\((.*?)\)/g, "abs($1)");
+        mathStr = mathStr.replace(/\\abs\{(.*?)\}/g, "abs($1)");
+
+        mathStr = mathStr.replace(/\\frac{(.*?)}{(.*?)}/g, "($1)/($2)");
+
+        mathStr = mathStr.replace(/\\cdot/g, "*");
+        mathStr = mathStr.replace(/\\times/g, "*");
+        mathStr = mathStr.replace(/\\div/g, "/");
+        mathStr = mathStr.replace(/\\pi/g, "pi");
+        mathStr = mathStr.replace(/\\e/g, "e");
+
+        mathStr = mathStr.replace(/\^\{(.*?)\}/g, "^($1)");
+        mathStr = mathStr.replace(/\^(\w|\d+(?:\.\d+)?)(?!\()/g, "^($1)");
+
+        mathStr = mathStr.replace(/{([a-zA-Z_][a-zA-Z0-9_]*)}/g, "$1");
+        mathStr = mathStr.replace(/{(\d+(?:\.\d+)?)}/g, "$1");
+        mathStr = mathStr.replace(/−/g, "-");
+
+        return mathStr;
     }
 
-    for (
-        let y = -Math.floor(canvas.height / yScale / 2);
-        y <= Math.floor(canvas.height / yScale / 2);
-        y++
-    ) {
-        const pixelY = -y * yScale * zoom + yOffset + panY;
-        ctx.fillText(y.toString(), xOffset - 20, pixelY);
-    }
-}
+    function addFunctionInputRow(initialValue = "", initialColor = null) {
+        functionCount++;
+        const templateContent = functionInputTemplate.content.cloneNode(true);
+        const newRow = templateContent.querySelector(".function-row");
+        const funcInput = newRow.querySelector(".function-input");
+        const colorInput = newRow.querySelector(".color-input");
+        const renderedLatexSpan = newRow.querySelector(".rendered-latex");
+        const removeBtn = newRow.querySelector(".remove-btn");
 
-function calculateGridSpacing(zoom) {
-    const baseSpacing = 50;
-    const unitSize = baseSpacing * zoom;
-
-    const spacingSteps = [
-        0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 25, 50, 100, 250, 500, 1000,
-        2500, 5000, 10000, 25000, 50000, 100000,
-    ];
-
-    let spacing = spacingSteps[0];
-    for (let step of spacingSteps) {
-        const minSpacing = zoom > 1 ? 40 : 60;
-        if (step * unitSize >= minSpacing) {
-            break;
+        funcInput.value = initialValue;
+        if (!initialColor) {
+            const defaultColors = [
+                "#1f77b4",
+                "#ff7f0e",
+                "#2ca02c",
+                "#d62728",
+                "#9467bd",
+                "#8c564b",
+                "#e377c2",
+                "#7f7f7f",
+                "#bcbd22",
+                "#17becf",
+            ];
+            colorInput.value =
+                defaultColors[(functionCount - 1) % defaultColors.length];
+        } else {
+            colorInput.value = initialColor;
         }
-        spacing = step;
+
+        const updatePreview = () => {
+            try {
+                if (typeof katex !== "undefined") {
+                    katex.render(funcInput.value || "", renderedLatexSpan, {
+                        throwOnError: false,
+                        displayMode: false,
+                        output: "html",
+                    });
+                }
+            } catch (e) {}
+        };
+        funcInput.addEventListener("input", updatePreview);
+        funcInput.addEventListener("input", debouncedPlotGraph);
+        setTimeout(updatePreview, 100);
+
+        colorInput.addEventListener("input", plotGraph);
+
+        removeBtn.addEventListener("click", () => {
+            newRow.remove();
+            plotGraph();
+        });
+
+        functionInputsContainer.appendChild(newRow);
+        plotGraph();
     }
 
-    return spacing;
-}
+    function plotGraph() {
+        plotErrorDiv.textContent = "";
+        const traces = [];
+        let isValidInput = true;
+        const useDegrees = useDegreesCheckbox.checked;
+        const isDarkMode = document.body.classList.contains("dark-mode");
 
-function formatNumber(num) {
-    if (Math.abs(num) >= 1) {
-        return Number(num.toFixed(0));
-    }
-    return Number(num.toFixed(1));
-}
+        const colors = {
+            bg: isDarkMode ? "#333333" : "#ffffff",
+            paper: isDarkMode ? "#333333" : "#ffffff",
+            text: isDarkMode ? "#eeeeee" : "#000000",
+            grid: isDarkMode ? "#666666" : "#dddddd",
+            zeroLine: isDarkMode ? "#aaaaaa" : "#999999",
+            axisLine: isDarkMode ? "#aaaaaa" : "#000000",
+        };
 
-function drawGrid() {
-    const isDark = document.body.classList.contains("dark-mode");
-    ctx.strokeStyle = isDark ? "#444" : "#ddd";
-    ctx.lineWidth = 1;
+        const constantsScope = {};
+        try {
+            const constantLines = constantsInput.value.split("\n");
+            constantLines.forEach((line) => {
+                line = line.trim();
+                if (line && !line.startsWith("#")) {
+                    const parts = line.split("=");
+                    if (parts.length === 2) {
+                        const key = parts[0].trim();
+                        const valueStr = simpleLatexToMathjs(parts[1].trim());
+                        if (key.match(/^[a-zA-Z_][a-zA-Z0-9_]*$/)) {
+                            constantsScope[key] = math.evaluate(valueStr);
+                        } else {
+                            throw new Error(`Invalid constant name: ${key}`);
+                        }
+                    } else if (line) {
+                        throw new Error(`Invalid constant definition: ${line}`);
+                    }
+                }
+            });
+        } catch (err) {
+            plotErrorDiv.textContent = `Error parsing constants: ${err.message}`;
+            isValidInput = false;
+        }
 
-    const spacing = calculateGridSpacing(zoom);
-    const pixelSpacing = spacing * xScale * zoom;
+        const evaluationScopeBase = { ...constantsScope };
+        const trigFuncs = [
+            "sin",
+            "cos",
+            "tan",
+            "asin",
+            "acos",
+            "atan",
+            "atan2",
+        ];
+        trigFuncs.forEach((f) => {
+            evaluationScopeBase[f] = useDegrees ? math[f + "d"] : math[f];
+        });
+        evaluationScopeBase.pi = Math.PI;
+        evaluationScopeBase.e = Math.E;
+        evaluationScopeBase.sqrt = math.sqrt;
+        evaluationScopeBase.log = math.log;
+        evaluationScopeBase.abs = math.abs;
+        evaluationScopeBase.exp = math.exp;
 
-    const startX = Math.floor((-panX - canvas.width / 2) / pixelSpacing);
-    const endX = Math.ceil((-panX + canvas.width / 2) / pixelSpacing);
-    const startY = Math.floor((-panY - canvas.height / 2) / pixelSpacing);
-    const endY = Math.ceil((-panY + canvas.height / 2) / pixelSpacing);
+        const xMin = parseFloat(xMinInput.value);
+        const xMax = parseFloat(xMaxInput.value);
+        const numPoints = parseInt(numPointsInput.value);
 
-    for (let i = startX; i <= endX; i++) {
-        const x = i * pixelSpacing + panX + xOffset;
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
-    }
+        if (
+            isNaN(xMin) ||
+            isNaN(xMax) ||
+            isNaN(numPoints) ||
+            numPoints < 2 ||
+            xMin >= xMax
+        ) {
+            plotErrorDiv.textContent =
+                "Invalid graph settings (X Min, X Max, Points). Min < Max, Points >= 2.";
+            isValidInput = false;
+        }
 
-    for (let i = startY; i <= endY; i++) {
-        const y = i * pixelSpacing + panY + yOffset;
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
-    }
-
-    ctx.strokeStyle = isDark ? "#666" : "#000";
-    ctx.lineWidth = 2;
-
-    ctx.beginPath();
-    ctx.moveTo(0, yOffset + panY);
-    ctx.lineTo(canvas.width, yOffset + panY);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(xOffset + panX, 0);
-    ctx.lineTo(xOffset + panX, canvas.height);
-    ctx.stroke();
-
-    ctx.font = "12px Arial";
-    ctx.fillStyle = isDark ? "#888" : "#000";
-
-    for (let i = startX; i <= endX; i++) {
-        const x = i * pixelSpacing + panX + xOffset;
-        const value = formatNumber(i * spacing);
-        ctx.fillText(value.toString(), x - 10, yOffset + panY + 20);
-    }
-
-    for (let i = startY; i <= endY; i++) {
-        const y = i * pixelSpacing + panY + yOffset;
-        const value = formatNumber(-i * spacing);
-        ctx.fillText(value.toString(), xOffset + panX - 30, y + 4);
-    }
-}
-
-function prepareMathExpression(expr) {
-    return expr.replace(/\^/g, "**");
-}
-
-function plotFunction(latex, color) {
-    const errorDisplay = document.getElementById("error-display");
-    if (errorDisplay) {
-        errorDisplay.textContent = "";
-    }
-
-    ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-
-    try {
-        const jsEquation = latexToJavaScript(latex);
-        for (let pixelX = 0; pixelX < canvas.width; pixelX++) {
-            const x = (pixelX - xOffset - panX) / xScale / zoom;
-            const result = eval(jsEquation.replace(/x/g, `(${x})`));
-            const y = -result * yScale * zoom + yOffset + panY;
-
-            if (pixelX === 0) {
-                ctx.moveTo(pixelX, y);
-            } else {
-                ctx.lineTo(pixelX, y);
+        const xValues = [];
+        if (isValidInput) {
+            const step = (xMax - xMin) / (numPoints - 1);
+            for (let i = 0; i < numPoints; i++) {
+                xValues.push(xMin + i * step);
             }
         }
-        ctx.stroke();
-    } catch (error) {
-        console.error("Invalid equation:", error);
-        if (errorDisplay) {
-            errorDisplay.textContent = "Error in equation: " + error.message;
-        }
-    }
-}
 
-function redrawGraph() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawGrid();
-    functions.forEach((func, index) => {
-        plotFunction(func, colors[index % colors.length]);
-    });
-}
+        const functionRows =
+            functionInputsContainer.querySelectorAll(".function-row");
+        let errorMessages = [];
 
-canvas.addEventListener("wheel", (e) => {
-    e.preventDefault();
-    const zoomFactor = e.deltaY > 0 ? 0.95 : 1.05;
-    const newZoom = zoom * zoomFactor;
+        functionRows.forEach((row, index) => {
+            const inputElement = row.querySelector(".function-input");
+            const colorElement = row.querySelector(".color-input");
+            const originalExpression = inputElement.value.trim();
 
-    if (newZoom > 0.000001 && newZoom < 1000000) {
-        zoom = newZoom;
-        redrawGraph();
-    }
-});
+            if (!originalExpression) return;
 
-canvas.addEventListener("mousedown", (e) => {
-    isDragging = true;
-    lastX = e.clientX;
-    lastY = e.clientY;
-});
+            const mathjsExpression = simpleLatexToMathjs(originalExpression);
+            let compiledExpr;
 
-canvas.addEventListener("mousemove", (e) => {
-    if (isDragging) {
-        panX += e.clientX - lastX;
-        panY += e.clientY - lastY;
-        lastX = e.clientX;
-        lastY = e.clientY;
-        redrawGraph();
-    }
-});
+            try {
+                compiledExpr = math.compile(mathjsExpression);
+            } catch (err) {
+                errorMessages.push(
+                    `Func ${
+                        index + 1
+                    } (${originalExpression}): Syntax Error - ${
+                        err.message
+                    } (Tried: "${mathjsExpression}")`
+                );
+                return;
+            }
 
-canvas.addEventListener("mouseup", () => {
-    isDragging = false;
-});
+            const yValues = [];
+            let evaluationErrors = 0;
 
-graphBtn.addEventListener("click", () => {
-    const func = equation.value;
-    if (func) {
-        functions.push(func);
-        equation.value = "";
-        redrawGraph();
-        updateFunctionList();
-    }
-});
+            if (xValues.length > 0) {
+                for (const x of xValues) {
+                    try {
+                        const currentScope = { ...evaluationScopeBase, x: x };
+                        let y = compiledExpr.evaluate(currentScope);
 
-function updateFunctionList() {
-    const list = document.getElementById("function-list");
-    list.innerHTML = "";
+                        if (typeof y === "object" && y.isComplex) {
+                            y = null;
+                        }
+                        if (!isFinite(y)) {
+                            y = null;
+                        }
+                        yValues.push(y);
+                    } catch (err) {
+                        if (evaluationErrors < 3) {
+                            console.warn(
+                                `Eval error "${originalExpression}" x=${x}: ${err.message}`
+                            );
+                            errorMessages.push(
+                                `Func ${
+                                    index + 1
+                                } (${originalExpression}): Eval near x=${x.toFixed(
+                                    2
+                                )} (Mode: ${useDegrees ? "Deg" : "Rad"})`
+                            );
+                        }
+                        evaluationErrors++;
+                        yValues.push(null);
+                    }
+                }
+                if (evaluationErrors >= 3) {
+                    errorMessages.push(
+                        `Func ${
+                            index + 1
+                        } (${originalExpression}): ... further eval errors.`
+                    );
+                }
+            }
 
-    functions.forEach((func, index) => {
-        const div = document.createElement("div");
-        div.className = "function-item";
-
-        const colorBox = document.createElement("div");
-        colorBox.className = "color-indicator";
-        colorBox.style.backgroundColor = colors[index % colors.length];
-
-        const text = document.createElement("div");
-        text.className = "latex-equation";
-        text.innerHTML = `\\[${func}\\]`;
-
-        const editSection = document.createElement("div");
-        editSection.className = "edit-section";
-        editSection.innerHTML = "✎";
-        editSection.onclick = () => editFunction(index);
-
-        const removeSection = document.createElement("div");
-        removeSection.className = "remove-section";
-        removeSection.innerHTML = "×";
-        removeSection.onclick = () => deleteFunction(index);
-
-        div.appendChild(colorBox);
-        div.appendChild(text);
-        div.appendChild(editSection);
-        div.appendChild(removeSection);
-        list.appendChild(div);
-    });
-
-    MathJax.typesetPromise();
-}
-
-let editingIndex = -1;
-const editModal = document.getElementById("edit-modal");
-const editEquation = document.getElementById("edit-equation");
-const saveEditBtn = document.getElementById("save-edit");
-const cancelEditBtn = document.getElementById("cancel-edit");
-
-function editFunction(index) {
-    editingIndex = index;
-    editEquation.value = functions[index];
-    editModal.classList.add("active");
-    updateEditPreview(functions[index]);
-}
-
-function updateEditPreview(latex) {
-    const preview = document.getElementById("edit-preview");
-    preview.innerHTML = `\\[${latex}\\]`;
-    MathJax.typesetPromise([preview]);
-}
-
-editEquation.addEventListener("input", (e) => {
-    updateEditPreview(e.target.value);
-});
-
-saveEditBtn.addEventListener("click", () => {
-    if (editingIndex !== -1) {
-        functions[editingIndex] = editEquation.value;
-        editModal.classList.remove("active");
-        redrawGraph();
-        updateFunctionList();
-    }
-});
-
-cancelEditBtn.addEventListener("click", () => {
-    editModal.classList.remove("active");
-});
-
-editModal.addEventListener("click", (e) => {
-    if (e.target === editModal) {
-        editModal.classList.remove("active");
-    }
-});
-
-editEquation.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-        saveEditBtn.click();
-    }
-    if (e.key === "Escape") {
-        cancelEditBtn.click();
-    }
-});
-
-function deleteFunction(index) {
-    functions.splice(index, 1);
-    redrawGraph();
-    updateFunctionList();
-}
-
-equation.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-        graphBtn.click();
-    }
-});
-
-equation.addEventListener("input", (e) => {
-    updateLatexPreview(e.target.value);
-});
-
-document.getElementById("dark-mode-toggle").addEventListener("change", (e) => {
-    document.body.classList.toggle("dark-mode", e.target.checked);
-    redrawGraph();
-});
-
-async function drawLegend(ctx, functions, colors) {
-    const tempDiv = document.createElement("div");
-    tempDiv.style.position = "absolute";
-    tempDiv.style.left = "-9999px";
-    tempDiv.style.backgroundColor = document.body.classList.contains(
-        "dark-mode"
-    )
-        ? "#444"
-        : "#f8f8f8";
-    tempDiv.style.padding = "20px";
-    document.body.appendChild(tempDiv);
-
-    const renderedEquations = [];
-    for (const func of functions) {
-        const eqDiv = document.createElement("div");
-        eqDiv.style.display = "inline-block";
-        eqDiv.style.color = document.body.classList.contains("dark-mode")
-            ? "#fff"
-            : "#000";
-        eqDiv.innerHTML = `\\[${func}\\]`;
-        tempDiv.appendChild(eqDiv);
-        renderedEquations.push(eqDiv);
-    }
-
-    await MathJax.typesetPromise();
-
-    const padding = 5; 
-    const lineHeight = 25;
-    const boxWidth = 15;
-    const boxPadding = 5;
-
-    let maxWidth = 0;
-    let maxHeight = 0;
-    renderedEquations.forEach((eq) => {
-        const mjxContainer = eq.querySelector(".MathJax");
-        if (mjxContainer) {
-            maxWidth = Math.max(maxWidth, mjxContainer.offsetWidth);
-            maxHeight = Math.max(maxHeight, mjxContainer.offsetHeight);
-        }
-    });
-
-    const legendWidth = maxWidth + boxWidth + padding * 8;
-    const legendHeight = functions.length * lineHeight + padding * 2;
-
-    const isDark = document.body.classList.contains("dark-mode");
-    ctx.fillStyle = isDark ? "#444" : "#f8f8f8";
-    ctx.strokeStyle = isDark ? "#666" : "#ccc";
-    ctx.lineWidth = 1;
-
-    ctx.beginPath();
-    ctx.roundRect(padding, padding, legendWidth, legendHeight, 5);
-    ctx.fill();
-    ctx.stroke();
-
-    for (let i = 0; i < functions.length; i++) {
-        const yCenter = padding + i * lineHeight + lineHeight / 2;
-
-        ctx.fillStyle = colors[i % colors.length];
-        ctx.fillRect(padding * 2, yCenter - boxWidth / 2, boxWidth, boxWidth);
-
-        const container = renderedEquations[i].querySelector(".MathJax");
-        if (container) {
-            container.style.color = isDark ? "#fff" : "#000";
-            const xml = `
-                <svg xmlns="http://www.w3.org/2000/svg" width="${
-                    container.offsetWidth
-                }" height="${container.offsetHeight}">
-                    <foreignObject width="100%" height="100%">
-                        <div xmlns="http://www.w3.org/1999/xhtml">
-                            <style>
-                                .mjx-math, .mjx-chtml { color: ${
-                                    isDark ? "#fff" : "#000"
-                                } !important; }
-                            </style>
-                            ${container.outerHTML}
-                        </div>
-                    </foreignObject>
-                </svg>
-            `;
-
-            const img = new Image();
-            await new Promise((resolve) => {
-                img.onload = resolve;
-                img.src =
-                    "data:image/svg+xml;base64," +
-                    btoa(unescape(encodeURIComponent(xml)));
+            traces.push({
+                x: xValues,
+                y: yValues,
+                mode: "lines",
+                type: "scatter",
+                name: originalExpression,
+                line: { color: colorElement.value, width: 2 },
+                connectgaps: false,
             });
+        });
 
-            ctx.drawImage(
-                img,
-                padding * 3 + boxWidth,
-                yCenter - img.height / 2
-            );
+        if (errorMessages.length > 0) {
+            plotErrorDiv.innerHTML = errorMessages.join("<br>");
+        }
+
+        const layout = {
+            plot_bgcolor: colors.bg,
+            paper_bgcolor: colors.paper,
+            font: { color: colors.text },
+            xaxis: {
+                title: "x",
+                range: [xMin, xMax],
+                gridcolor: colors.grid,
+                zerolinecolor: colors.zeroLine,
+                linecolor: colors.axisLine,
+                zeroline: true,
+                zerolinewidth: 1,
+            },
+            yaxis: {
+                title: "y",
+                autorange: true,
+                gridcolor: colors.grid,
+                zerolinecolor: colors.zeroLine,
+                linecolor: colors.axisLine,
+                zeroline: true,
+                zerolinewidth: 1,
+            },
+            hovermode: "closest",
+            legend: {
+                font: { color: colors.text },
+                bgcolor: isDarkMode
+                    ? "rgba(51,51,51,0.7)"
+                    : "rgba(255,255,255,0.7)",
+                bordercolor: colors.grid,
+                borderwidth: 1,
+            },
+            margin: { l: 50, r: 30, b: 40, t: 40 },
+        };
+
+        if (typeof Plotly !== "undefined") {
+            Plotly.react(plotDiv, traces, layout).catch((err) => {
+                console.error("Plotly error: ", err);
+                plotErrorDiv.textContent = `Plotting library error: ${err.message}`;
+            });
+        } else {
+            plotErrorDiv.textContent =
+                "Plotting library (Plotly.js) failed to load.";
         }
     }
 
-    document.body.removeChild(tempDiv);
-}
+    saveImageBtn.addEventListener("click", () => {
+        if (typeof Plotly !== "undefined" && plotDiv) {
+            const isDarkMode = document.body.classList.contains("dark-mode");
+            const layoutUpdate = plotDiv.layout;
+            const filename =
+                (layoutUpdate && layoutUpdate.title && layoutUpdate.title.text
+                    ? layoutUpdate.title.text
+                          .replace(/[^a-z0-9_]+/gi, "_")
+                          .toLowerCase()
+                    : "graph_export") + ".png";
 
-document.getElementById("save-image").addEventListener("click", async () => {
-    const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = canvas.width;
-    tempCanvas.height = canvas.height;
-    const tempCtx = tempCanvas.getContext("2d");
+            const saveOptions = {
+                format: "png",
+                filename: filename,
+                width: plotDiv.clientWidth || 800,
+                height: plotDiv.clientHeight || 600,
+            };
 
-    tempCtx.fillStyle = document.body.classList.contains("dark-mode")
-        ? "#333"
-        : "#fff";
-    tempCtx.fillRect(0, 0, canvas.width, canvas.height);
+            Plotly.downloadImage(plotDiv, saveOptions).catch((err) => {
+                console.error("Error downloading image:", err);
+                plotErrorDiv.textContent = `Error downloading image: ${err.message}`;
+            });
+        } else {
+            plotErrorDiv.textContent =
+                "Cannot save image: Plotting library/div not ready.";
+        }
+    });
 
-    tempCtx.drawImage(canvas, 0, 0);
+    copyImageBtn.addEventListener("click", () => {
+        if (typeof Plotly !== "undefined" && plotDiv) {
+            Plotly.toImage(plotDiv, { format: "png" }).then((dataUrl) => {
+                navigator.clipboard
+                    .write([
+                        new ClipboardItem({
+                            "image/png": fetch(dataUrl)
+                                .then((res) => res.blob())
+                                .then(
+                                    (blob) =>
+                                        new Blob([blob], { type: "image/png" })
+                                ),
+                        }),
+                    ])
+                    .then(() => {
+                        plotInfoDiv.textContent = "Image copied to clipboard.";
+                    })
+                    .catch((err) => {
+                        console.error("Error copying image:", err);
+                        plotErrorDiv.textContent = `Error copying image: ${err.message}`;
+                    });
+            });
+        } else {
+            plotErrorDiv.textContent =
+                "Cannot copy image: Plotting library/div not ready.";
+        }
+    });
 
-    if (functions.length > 0) {
-        await drawLegend(tempCtx, functions, colors);
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener("change", plotGraph);
     }
 
-    const link = document.createElement("a");
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    link.download = `graph-${timestamp}.png`;
-    link.href = tempCanvas.toDataURL("image/png");
-    link.click();
-});
+    addFunctionBtn.addEventListener("click", () => addFunctionInputRow());
 
-redrawGraph();
+    xMinInput.addEventListener("change", plotGraph);
+    xMaxInput.addEventListener("change", plotGraph);
+    numPointsInput.addEventListener("change", plotGraph);
+    useDegreesCheckbox.addEventListener("change", plotGraph);
+
+    constantsInput.addEventListener("input", debouncedPlotGraph);
+
+    if (plotBtn) {
+        plotBtn.textContent = "Refresh Plot";
+        plotBtn.addEventListener("click", plotGraph);
+    }
+
+    function initialize() {
+        addFunctionInputRow("");
+
+        if (typeof Plotly !== "undefined") {
+            plotGraph();
+        } else {
+            setTimeout(() => {
+                if (typeof Plotly !== "undefined") {
+                    plotGraph();
+                } else {
+                    plotErrorDiv.textContent =
+                        "Plotting library failed to load.";
+                }
+            }, 500);
+        }
+    }
+
+    initialize();
+});

@@ -1,211 +1,304 @@
-#graph-input {
+#controlsWrapper {
+    padding: 1rem 0;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.controls-grid {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-}
-
-#equation {
-    width: 300px;
-    padding: 8px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-#graph-btn {
-    padding: 8px 16px;
-    font-size: 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-canvas {
-    border: 1px solid #ccc;
-    margin-top: 1rem;
-}
-
-.dark-mode canvas {
-    border-color: #444;
-    background-color: #333;
-}
-
-#function-list {
-    margin-top: 1rem;
-    max-width: 300px;
-}
-
-#function-list div {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0.25rem 0;
-}
-
-.color-indicator {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-}
-
-.remove-btn {
-    background: #ff4444;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
     justify-content: center;
+    margin-bottom: 1.5rem;
 }
 
-.function-item {
-    display: grid;
-    grid-template-columns: 20px 1fr 30px 30px;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem;
-    background-color: rgba(0, 0, 0, 0.05);
-    border-radius: 4px;
-    margin: 0.25rem 0;
-}
-
-.dark-mode .function-item {
-    background-color: rgba(255, 255, 255, 0.05);
-}
-
-.edit-section,
-.remove-section {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.edit-section {
-    background-color: #4caf50;
-    color: white;
-}
-
-.edit-section:hover {
-    background-color: #45a049;
-}
-
-.remove-section {
-    background-color: #ff4444;
-    color: white;
-}
-
-.remove-section:hover {
-    background-color: #ff3333;
-}
-
-.edit-btn,
-.remove-btn {
-    display: none;
-}
-
-.edit-btn {
-    background: #4caf50;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-}
-
-.edit-btn:hover {
-    background: #45a049;
-}
-
-.function-item span {
-    flex: 1;
-    font-family: monospace;
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal.active {
-    display: flex;
-}
-
-.modal-content {
-    background-color: var(--background-color);
-    padding: 2rem;
+.control-group {
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    min-width: 300px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    background-color: var(--background-color);
+    flex: 1;
+    min-width: 280px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.modal-content h2 {
+body.dark-mode .control-group {
+    background-color: var(--background-color);
+}
+
+.control-group h3 {
     margin-top: 0;
     margin-bottom: 1rem;
-    color: var(--text-color);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+    font-size: 1.1em;
 }
 
-#edit-equation {
-    width: 100%;
-    margin-bottom: 1rem;
+.control-group h3 small {
+    font-weight: 400;
+    font-size: 0.8em;
+    color: #888;
+}
+body.dark-mode .control-group h3 small {
+    color: #bbb;
 }
 
-.modal-buttons {
+.setting-row {
     display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+.setting-row:last-child {
+    margin-bottom: 0;
 }
 
-.modal-buttons button {
-    min-width: 80px;
+.setting-row label {
+    margin-right: 5px;
 }
 
-#cancel-edit {
-    background-color: #666;
+.setting-row input[type="number"] {
+    width: 80px;
+    padding: 8px;
 }
 
-#cancel-edit:hover {
+.checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    margin-left: 15px;
+}
+.checkbox-label input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+#functionInputs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+    max-height: 150px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+#functionInputs::-webkit-scrollbar {
+    width: 8px;
+}
+#functionInputs::-webkit-scrollbar-track {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+#functionInputs::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+body.dark-mode #functionInputs::-webkit-scrollbar-thumb {
+    background: #555;
+}
+#functionInputs::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+body.dark-mode #functionInputs::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+
+.function-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 5px;
+}
+.function-row .function-input {
+    flex-grow: 1;
+    min-width: 150px;
+}
+.rendered-latex {
+    background-color: var(--border-color);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    min-width: 40px;
+    text-align: center;
+    white-space: nowrap;
+    overflow-x: auto;
+    max-width: 80px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+.rendered-latex .katex {
+    font-size: 1em !important;
+    vertical-align: middle;
+}
+.function-row .color-input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: transparent;
+    flex-shrink: 0;
+}
+.function-row .color-input::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+.function-row .color-input::-webkit-color-swatch {
+    border: none;
+    border-radius: 3px;
+}
+.function-row .color-input::-moz-color-swatch {
+    border: none;
+    border-radius: 3px;
+}
+.function-row .remove-btn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    font-size: 1.2em;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 4px;
+    flex-shrink: 0;
+    transition: background-color 0.2s ease;
+}
+.function-row .remove-btn:hover {
+    background-color: #d32f2f;
+}
+
+.add-func-btn {
+    margin-top: 10px;
+    display: block;
+    width: 100%;
+}
+
+#constantsInput {
+    height: 90px;
+    font-size: 0.95em;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 0;
+    resize: none;
+}
+
+.action-buttons-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    padding-top: 1rem;
+}
+
+.secondary-button {
+    background-color: #777;
+}
+body.dark-mode .secondary-button {
     background-color: #555;
 }
+.secondary-button:hover {
+    background-color: #666;
+}
+body.dark-mode .secondary-button:hover {
+    background-color: #444;
+}
 
-.controls-bottom {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+#plotArea {
     width: 100%;
-    margin-top: 0.5rem;
+    min-height: 500px;
+    margin-top: 1.5rem;
+
+    padding: 0;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
 }
 
-#save-image {
-    font-size: 0.9rem;
-    padding: 6px 12px;
-    background-color: var(--button-bg-color);
+#plot {
+    width: 100%;
+    height: 100%;
+}
+
+.error-message {
+    color: #d32f2f;
+    background-color: rgba(244, 67, 54, 0.1);
+    border: 1px solid rgba(211, 47, 47, 0.5);
+    padding: 10px;
     border-radius: 4px;
-    transition: background-color 0.2s;
+    margin: 1rem 0;
+    white-space: pre-wrap;
+    font-size: 0.9em;
+}
+.error-message:empty {
+    display: none;
+}
+.info-message {
+    color: #1976d2;
+    background-color: rgba(25, 118, 210, 0.1);
+    border: 1px solid rgba(25, 118, 210, 0.5);
+    padding: 10px;
+    border-radius: 4px;
+    margin: 1rem 0;
+    white-space: pre-wrap;
+    font-size: 0.9em;
+}
+.info-message:empty {
+    display: none;
 }
 
-#save-image:hover {
-    background-color: var(--button-hover-bg-color);
+@media screen and (max-width: 768px) {
+    .controls-grid {
+        gap: 15px;
+    }
+    .control-group {
+        min-width: 250px;
+    }
+    #plotArea {
+        min-height: 400px;
+    }
+    .action-buttons-group {
+        flex-direction: column;
+        align-items: center;
+    }
+    .action-buttons-group button {
+        width: 80%;
+        max-width: 300px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    h1 {
+        font-size: 1.5em;
+    }
+    .container {
+        padding: 10px;
+    }
+    .controls-grid {
+        display: block;
+    }
+    .control-group {
+        width: 100%;
+        margin-bottom: 15px;
+        min-width: unset;
+    }
+    .controls-grid .control-group:last-child {
+        margin-bottom: 0;
+    }
+    .setting-row input[type="number"] {
+        width: 60px;
+    }
+    .rendered-latex {
+        max-width: 70px;
+    }
+    .action-buttons-group button {
+        width: 95%;
+    }
+    #functionInputs {
+        max-height: 120px;
+    }
 }
