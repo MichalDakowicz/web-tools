@@ -1,0 +1,193 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+#wheelArea {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 0;
+    margin-bottom: 1.5rem;
+}
+
+#wheelContainer {
+    position: relative;
+    width: 350px;
+    height: 350px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#wheelContainer,
+#wheel {
+    box-sizing: border-box;
+}
+
+#pointer {
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 30px solid #f03e3e;
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.3));
+}
+
+#wheel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 5px solid var(--border-color);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+    transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
+    background-color: var(--border-color);
+}
+
+#segmentTextContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.segment-text-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform-origin: center center;
+}
+
+.segment-text {
+    display: block;
+    position: absolute;
+
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--text-color);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    user-select: none;
+    text-align: center;
+    max-width: 80%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: #000 !important;
+}
+
+#inputControls {
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    background-color: var(--background-color);
+}
+#inputControls h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+    font-size: 1.1em;
+}
+.instructions {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 0.75rem;
+}
+.instructions code {
+    background-color: var(--border-color);
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: "Roboto Mono", monospace;
+}
+body.dark-mode .instructions {
+    color: #bbb;
+}
+body.dark-mode .instructions code {
+    background-color: #555;
+}
+
+#segmentInput {
+    width: 100%;
+    margin-bottom: 1rem;
+
+    font-family: "Roboto Mono", monospace;
+    font-size: 0.95em;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+#spinButton:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+body.dark-mode #spinButton:disabled {
+    background-color: #555;
+}
+
+#result {
+    text-align: center;
+    font-size: 1.1rem;
+    min-height: 1.5em;
+}
+#resultText {
+    color: var(--button-bg-color);
+    font-weight: bold;
+}
+body.dark-mode #resultText {
+    color: #69db7c;
+}
+
+@media screen and (max-width: 600px) {
+    #wheelContainer {
+        width: 300px;
+        height: 300px;
+    }
+    .segment-text {
+        font-size: 0.7rem;
+        top: 18%;
+    }
+    #pointer {
+        border-left-width: 15px;
+        border-right-width: 15px;
+        border-top-width: 25px;
+        top: -12px;
+    }
+}
+@media screen and (max-width: 400px) {
+    #wheelContainer {
+        width: 250px;
+        height: 250px;
+    }
+    .segment-text {
+        font-size: 0.6rem;
+        top: 20%;
+    }
+    .button-group {
+        flex-direction: column;
+    }
+    .button-group button {
+        width: 100%;
+    }
+}
