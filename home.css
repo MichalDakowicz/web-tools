@@ -27,3 +27,13 @@
 .uncomplete {
     filter: brightness(0.8) !important;
 }
+
+@media screen and (max-width: 768px) {
+    #grid {
+        grid-template-columns: 1fr;
+    }
+    .card {
+        margin: 0 auto;
+        width: calc(100% - 2rem);
+    }
+}

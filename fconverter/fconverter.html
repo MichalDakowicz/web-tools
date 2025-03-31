@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>File Converter</title>
+        <link rel="stylesheet" href="../style.css" />
+        <link rel="stylesheet" href="fconverter.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Client-Side File Converter</h1>
+            <p
+                style="
+                    text-align: center;
+                    font-size: 0.9em;
+                    margin-bottom: 1rem;
+                "
+            >
+                <i
+                    >Note: Conversions happen in your browser. Complex formats
+                    (esp. video/audio) have limitations.</i
+                >
+            </p>
+
+            <div class="input-section">
+                <div class="custom-file-input">
+                    <input
+                        type="file"
+                        name="fileInput"
+                        id="fileInput"
+                        class="file-input-hidden"
+                        aria-label="File input"
+                    />
+                    <div
+                        class="file-input-wrapper"
+                        role="button"
+                        tabindex="0"
+                        aria-label="File input area"
+                    >
+                        <div class="file-input-content">
+                            <svg
+                                class="upload-icon"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"
+                                />
+                            </svg>
+                            <span class="file-input-text" id="fileInputText"
+                                >Drop your file here or click to browse</span
+                            >
+                            <span
+                                class="file-input-subtext"
+                                id="fileInputSubtext"
+                            >
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="conversion-options">
+                    <label
+                        for="formatSelect"
+                        style="
+                            display: block;
+                            margin-bottom: 5px;
+                            font-weight: 500;
+                        "
+                        >Convert to:</label
+                    >
+                    <select
+                        id="formatSelect"
+                        disabled
+                        aria-label="Target conversion format"
+                    >
+                        <option value="">Select input file first...</option>
+                    </select>
+                </div>
+
+                <button id="convertBtn" disabled>Convert File</button>
+            </div>
+
+            <div class="output-section" id="outputSection" aria-live="polite">
+                <div
+                    id="outputMessage"
+                    style="font-weight: 500; margin-bottom: 1rem"
+                ></div>
+                <div id="downloadContainer" style="margin-bottom: 1rem"></div>
+                <div
+                    id="previewContainer"
+                    aria-label="Conversion preview"
+                ></div>
+            </div>
+        </div>
+
+        <div id="darkMode">
+            <input
+                type="checkbox"
+                id="dark-mode-toggle"
+                aria-label="Toggle dark mode"
+            />
+            <label for="dark-mode-toggle" style="cursor: pointer"
+                ><b>Dark Mode</b></label
+            >
+        </div>
+
+        <script src="../script.js"></script>
+        <script src="fconverter.js"></script>
+    </body>
+</html>

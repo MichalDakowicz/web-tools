@@ -282,7 +282,7 @@ body.dark-mode .secondary-button:hover {
         display: block;
     }
     .control-group {
-        width: 100%;
+        width: calc(100% - 30px);
         margin-bottom: 15px;
         min-width: unset;
     }

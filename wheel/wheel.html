@@ -4,29 +4,32 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Fortune Wheel</title>
-        
+
         <link rel="stylesheet" href="../style.css" />
-        
+
         <link rel="stylesheet" href="wheel.css" />
     </head>
     <body>
         <div class="container">
-            <h1>Fortune Wheel</h1>
+            <div id="result">
+                <p>Result: <strong id="resultText">---</strong></p>
+            </div>
 
             <div id="wheelArea">
                 <div id="wheelContainer">
                     <div id="wheel">
-                        <div id="segmentTextContainer">
-                            
-                        </div>
+                        <div id="segmentTextContainer"></div>
                     </div>
                     <div id="pointer"></div>
                 </div>
             </div>
 
             <div id="inputControls" class="control-group">
-                
                 <h3>Wheel Segments</h3>
+                <div class="button-group">
+                    <button id="updateWheelButton">Update Wheel</button>
+                    <button id="spinButton">Spin!</button>
+                </div>
                 <p class="instructions">
                     Enter one segment per line.<br />Optional format:
                     <code>Segment Text, #hexcolor</code>
@@ -38,28 +41,16 @@
 Try Again, #ffc9c9
 Bonus Spin, #ffd43b"
                 ></textarea>
-                <div class="button-group">
-                    <button id="updateWheelButton">Update Wheel</button>
-                    <button id="spinButton">Spin!</button>
-                </div>
-            </div>
-
-            <div id="result">
-                <p>Result: <strong id="resultText">---</strong></p>
             </div>
         </div>
-        
 
-        
         <div id="darkMode">
             <input type="checkbox" id="dark-mode-toggle" />
             <b>Dark Mode</b>
         </div>
 
-        
         <script src="wheel.js"></script>
 
-        
         <script src="../script.js"></script>
     </body>
 </html>

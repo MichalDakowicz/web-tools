@@ -6,6 +6,11 @@
         <title>Home</title>
         <link rel="stylesheet" href="style.css" />
         <link rel="stylesheet" href="home.css" />
+        <style>
+            .home-button {
+                display: none !important;
+            }
+        </style>
     </head>
     <body>
         <div id="grid">
@@ -60,12 +65,21 @@
                     <p>random picker from options you input</p>
                 </div>
             </a>
-            <div class="card uncomplete">
-                <h2>File Converter</h2>
-                <p>
-                    convert between file formats (e.g., png to jpg, mp4 to mp3)
-                </p>
-            </div>
+            <a href="fconverter/fconverter.html">
+                <div class="card">
+                    <h2>File Converter</h2>
+                    <p>
+                        convert between file formats (e.g., png to jpg, mp4 to
+                        mp3)
+                    </p>
+                </div>
+            </a>
+            <a href="latex/latex.html">
+                <div class="card">
+                    <h2>LaTeX OCR</h2>
+                    <p>extract latex code from an image inputted</p>
+                </div>
+            </a>
             <div class="card uncomplete">
                 <h2>Regex Tester</h2>
                 <p>enter a regex pattern and test it against sample text</p>
