@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Regex Tester</title>
+        <link rel="stylesheet" href="../style.css" />
+        <link rel="stylesheet" href="regex.css" />
+    </head>
+    <body>
+        <div class="container">
+            <div class="regex-tester-grid">
+                <div class="input-column">
+                    <div class="control-group">
+                        <label for="regexInput">Regular Expression</label>
+                        <div class="regex-input-wrapper">
+                            <span class="regex-delimiter">/</span>
+                            <input
+                                type="text"
+                                id="regexInput"
+                                placeholder="Enter your pattern here"
+                                spellcheck="false"
+                            />
+                            <span class="regex-delimiter">/</span>
+                            <div id="regexFlags">
+                                <label title="Global search"
+                                    ><input
+                                        type="checkbox"
+                                        id="flagG"
+                                        value="g"
+                                        checked
+                                    />
+                                    g</label
+                                >
+                                <label title="Case-insensitive"
+                                    ><input
+                                        type="checkbox"
+                                        id="flagI"
+                                        value="i"
+                                    />
+                                    i</label
+                                >
+                                <label title="Multiline mode"
+                                    ><input
+                                        type="checkbox"
+                                        id="flagM"
+                                        value="m"
+                                    />
+                                    m</label
+                                >
+                                <label title="Dot matches newline"
+                                    ><input
+                                        type="checkbox"
+                                        id="flagS"
+                                        value="s"
+                                    />
+                                    s</label
+                                >
+                                <label title="Unicode mode"
+                                    ><input
+                                        type="checkbox"
+                                        id="flagU"
+                                        value="u"
+                                    />
+                                    u</label
+                                >
+                                <label title="Sticky mode"
+                                    ><input
+                                        type="checkbox"
+                                        id="flagY"
+                                        value="y"
+                                    />
+                                    y</label
+                                >
+                            </div>
+                        </div>
+                        <div
+                            id="regexError"
+                            class="error-message inline-error"
+                        ></div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="testString">Test String</label>
+                        <textarea
+                            id="testString"
+                            rows="10"
+                            placeholder="Enter the text to test against"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <div class="output-column">
+                    <div class="control-group">
+                        <label>Result (Highlighted)</label>
+                        <div id="highlightedTextContainer">
+                            <pre><code id="highlightedText"> </code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Match Information -->
+                        <label>Match Information</label>
+                        <div id="matchInfoContainer">
+                            <pre id="matchInfo">Enter a regex and test string.</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="darkMode">
+            <input type="checkbox" id="dark-mode-toggle" />
+            <b>Dark Mode</b>
+        </div>
+
+        <script src="regex.js"></script>
+
+        <script src="../script.js"></script>
+    </body>
+</html>

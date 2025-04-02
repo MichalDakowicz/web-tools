@@ -1,0 +1,193 @@
+.regex-tester-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+@media screen and (min-width: 768px) {
+    .regex-tester-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.input-column,
+.output-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.control-group {
+    padding: 15px;
+}
+
+.control-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+.regex-input-wrapper {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 0 10px;
+    background-color: var(--background-color);
+}
+body.dark-mode .regex-input-wrapper {
+    background-color: var(--background-color);
+}
+
+.regex-delimiter {
+    font-size: 1.2em;
+    color: #888;
+    padding: 0 5px;
+}
+body.dark-mode .regex-delimiter {
+    color: #aaa;
+}
+
+#regexInput {
+    flex-grow: 1;
+    border: none;
+    padding: 10px 5px;
+    font-family: "Roboto Mono", monospace;
+    font-size: 1em;
+    background-color: transparent;
+    color: var(--text-color);
+    outline: none;
+    min-width: 100px;
+}
+
+#regexFlags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-left: 10px;
+    padding-left: 10px;
+    border-left: 1px solid var(--border-color);
+}
+
+#regexFlags label {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 0;
+    font-weight: normal;
+    font-family: "Roboto Mono", monospace;
+    font-size: 0.9em;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+#regexFlags input[type="checkbox"] {
+    margin-right: 4px;
+}
+
+.inline-error {
+    margin-top: 8px;
+    padding: 5px 10px;
+    font-size: 0.9em;
+}
+
+#testString {
+    width: 100%;
+
+    font-family: "Roboto Mono", monospace;
+}
+
+#highlightedTextContainer,
+#matchInfoContainer {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 10px;
+    background-color: var(--background-color);
+    min-height: 100px;
+    max-height: 300px;
+    overflow: auto;
+}
+
+#highlightedTextContainer pre,
+#matchInfoContainer pre {
+    margin: 0;
+    font-family: "Roboto Mono", monospace;
+    font-size: 0.95em;
+    color: var(--text-color);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+#highlightedTextContainer code {
+    display: block;
+}
+
+.match-highlight {
+    background-color: rgba(255, 255, 0, 0.5);
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(255, 200, 0, 0.6);
+}
+
+body.dark-mode .match-highlight {
+    background-color: rgba(212, 172, 13, 0.6);
+    box-shadow: 0 0 0 1px rgba(255, 200, 0, 0.7);
+}
+
+#matchInfo .match-index {
+    color: #888;
+    font-size: 0.85em;
+}
+body.dark-mode #matchInfo .match-index {
+    color: #aaa;
+}
+#matchInfo .match-group {
+    color: #007bff;
+}
+body.dark-mode #matchInfo .match-group {
+    color: #36a3f7;
+}
+#matchInfo .no-matches {
+    color: #888;
+    font-style: italic;
+}
+body.dark-mode #matchInfo .no-matches {
+    color: #aaa;
+}
+
+.error-message {
+    color: #d32f2f;
+    background-color: rgba(244, 67, 54, 0.1);
+    border: 1px solid rgba(211, 47, 47, 0.5);
+    padding: 10px;
+    border-radius: 4px;
+
+    white-space: pre-wrap;
+    font-size: 0.9em;
+    display: none;
+}
+.error-message.visible {
+    display: block;
+}
+
+@media screen and (max-width: 480px) {
+    h1 {
+        font-size: 1.5em;
+    }
+    .container {
+        padding: 10px;
+    }
+    .regex-tester-grid {
+        gap: 1rem;
+    }
+    .control-group {
+        padding: 10px;
+    }
+    #regexFlags {
+        margin-left: 5px;
+        padding-left: 5px;
+        gap: 5px;
+    }
+    #regexFlags label {
+        font-size: 0.8em;
+    }
+}
