@@ -1,0 +1,108 @@
+.textarea-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.textarea-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+textarea {
+    height: 150px;
+    font-size: 1rem;
+}
+
+#outputText {
+    background-color: var(--border-color);
+    opacity: 0.9;
+}
+
+body.dark-mode #outputText {
+    background-color: #444;
+}
+
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border: 1px dashed var(--border-color);
+    border-radius: 4px;
+    justify-content: center;
+}
+
+.controls button {
+    flex-grow: 1;
+    min-width: 120px;
+    text-align: center;
+}
+
+.secondary-button {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+.secondary-button:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+body.dark-mode .secondary-button {
+    background-color: #555e64;
+}
+body.dark-mode .secondary-button:hover {
+    background-color: #495057;
+}
+
+.output-group .copy-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    padding: 5px 10px;
+    font-size: 0.8em;
+    z-index: 5;
+}
+
+.text-stats {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.9rem;
+    background-color: var(--background-color);
+}
+
+.text-stats p {
+    margin: 0;
+}
+
+.text-stats span {
+    font-weight: bold;
+    color: var(--button-bg-color);
+}
+
+body.dark-mode .text-stats span {
+    color: #90caf9;
+}
+
+@media screen and (max-width: 600px) {
+    .controls {
+        gap: 8px;
+    }
+    .controls button {
+        min-width: 100px;
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+    textarea {
+        height: 120px;
+    }
+    .text-stats {
+        justify-content: flex-start;
+    }
+}

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Text Manipulator</title>
+        <link rel="stylesheet" href="../style.css" />
+        <link rel="stylesheet" href="text.css" />
+    </head>
+    <body>
+        <div class="container">
+            <h1>Text Manipulator</h1>
+
+            <div class="textarea-group">
+                <label for="inputText">Input Text:</label>
+                <textarea
+                    id="inputText"
+                    placeholder="Enter or paste your text here..."
+                    rows="8"
+                ></textarea>
+            </div>
+
+            <div class="controls">
+                <button id="btnUppercase" title="Convert text to UPPERCASE">
+                    Uppercase
+                </button>
+                <button id="btnLowercase" title="Convert text to lowercase">
+                    Lowercase
+                </button>
+                <button id="btnSentenceCase" title="Convert text to Sentence case.">
+                    Sentence Case
+                </button>
+                <button id="btnTitleCase" title="Convert Text To Title Case">
+                    Title Case
+                </button>
+                 <button id="btnCapitalize" title="Capitalize First Letter Of Text">
+                    Capitalize
+                </button>
+                <button id="btnReverse" title="Reverse the entire text">
+                    Reverse Text
+                </button>
+                <button id="btnReverseWords" title="Reverse the order of words">
+                    Reverse Words
+                </button>
+                 <button id="btnTrim" title="Remove leading/trailing whitespace">
+                    Trim Whitespace
+                </button>
+                <button id="btnClear" class="secondary-button" title="Clear input and output">Clear All</button>
+            </div>
+
+            <div class="textarea-group output-group">
+                <label for="outputText">Output Text:</label>
+                 <textarea
+                    id="outputText"
+                    placeholder="Result will appear here..."
+                    rows="8"
+                    readonly
+                ></textarea>
+                <button id="btnCopyOutput" class="copy-button" title="Copy output text to clipboard">
+                    Copy
+                </button>
+            </div>
+
+            <div class="text-stats">
+                <p>Characters: <span id="charCount">0</span></p>
+                <p>Words: <span id="wordCount">0</span></p>
+                <p>Lines: <span id="lineCount">0</span></p>
+            </div>
+
+        </div>
+
+        <div id="darkMode">
+            <input type="checkbox" id="dark-mode-toggle" />
+            <b>Dark Mode</b>
+        </div>
+
+        <script src="../script.js"></script>
+        <script src="text.js"></script>
+    </body>
+</html>
