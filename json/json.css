@@ -1,0 +1,280 @@
+pre[class*="language-"] {
+    margin: 0;
+    overflow: auto;
+}
+
+code[class*="language-"] {
+    font-family: "Roboto Mono", monospace;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    white-space: pre;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.json-tool-container {
+    max-width: 70%;
+}
+
+.formatter-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+@media screen and (min-width: 992px) {
+    .formatter-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.editor-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 300px;
+}
+
+.editor-container label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.editor-wrapper {
+    position: relative;
+    flex-grow: 1;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.line-numbers {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 45px;
+    padding: 10px 5px 10px 0;
+    background-color: #f0f0f0;
+    color: #888;
+    font-family: "Roboto Mono", monospace;
+    font-size: 0.9em;
+    line-height: 1.5;
+    text-align: right;
+    overflow: hidden;
+    user-select: none;
+    pointer-events: none;
+    border-right: 1px solid var(--border-color);
+    box-sizing: border-box;
+    z-index: 3;
+}
+
+.line-numbers > div {
+    display: block;
+}
+
+body.dark-mode .line-numbers {
+    background-color: #2a2a2a;
+    color: #aaa;
+    border-right-color: #555;
+}
+
+.line-numbers div.error-line {
+    background-color: #f8d7da;
+    color: #721c24;
+    font-weight: bold;
+}
+
+body.dark-mode .line-numbers div.error-line {
+    background-color: #542529;
+    color: #f8d7da;
+}
+
+#jsonInput.code-editor {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 350px;
+    padding: 10px 10px 10px 55px;
+    border: none;
+    border-radius: 0;
+    font-family: "Roboto Mono", monospace;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    resize: none;
+    box-sizing: border-box;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow: auto;
+}
+body.dark-mode #jsonInput.code-editor {
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+}
+
+#jsonOutputDisplay.code-editor {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 350px;
+    padding: 10px 10px 10px 55px;
+    border: none;
+    border-radius: 0;
+    box-sizing: border-box;
+    background-color: #f8f8f8;
+    color: var(--text-color);
+    overflow: auto;
+    margin: 0;
+}
+body.dark-mode #jsonOutputDisplay.code-editor {
+    background-color: #252526;
+    color: #d4d4d4;
+}
+
+.clear-textarea-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(128, 128, 128, 0.5);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    line-height: 22px;
+    text-align: center;
+    cursor: pointer;
+    padding: 0;
+    z-index: 5;
+}
+.clear-textarea-button:hover {
+    background: rgba(100, 100, 100, 0.7);
+}
+body.dark-mode .clear-textarea-button {
+    background: rgba(80, 80, 80, 0.7);
+}
+body.dark-mode .clear-textarea-button:hover {
+    background: rgba(60, 60, 60, 0.9);
+}
+
+.editor-wrapper .copy-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 5px 10px;
+    font-size: 0.8em;
+    z-index: 5;
+}
+
+.controls-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+@media screen and (min-width: 768px) {
+    .controls-status {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+#formatButton {
+    padding: 10px 25px;
+    font-weight: bold;
+    min-width: 150px;
+}
+
+.status-box {
+    padding: 10px 15px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    min-height: 1.5em;
+    text-align: center;
+    flex-grow: 1;
+    display: none;
+    border: 1px solid transparent;
+}
+
+.status-box.success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    display: block;
+}
+body.dark-mode .status-box.success {
+    color: #d4edda;
+    background-color: #1c4a2a;
+    border-color: #2a683d;
+}
+
+.status-box.error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    display: block;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+body.dark-mode .status-box.error {
+    color: #f8d7da;
+    background-color: #542529;
+    border-color: #73272f;
+}
+
+body.dark-mode pre[class*="language-"] {
+    background: #252526;
+    color: #d4d4d4;
+}
+body.dark-mode code[class*="language-"] {
+    text-shadow: none;
+}
+body.dark-mode .token.punctuation {
+    color: #d4d4d4;
+}
+body.dark-mode .token.property,
+body.dark-mode .token.tag,
+body.dark-mode .token.boolean,
+body.dark-mode .token.number,
+body.dark-mode .token.constant,
+body.dark-mode .token.symbol,
+body.dark-mode .token.deleted {
+    color: #b5cea8;
+}
+body.dark-mode .token.selector,
+body.dark-mode .token.attr-name,
+body.dark-mode .token.string,
+body.dark-mode .token.char,
+body.dark-mode .token.builtin,
+body.dark-mode .token.inserted {
+    color: #ce9178;
+}
+body.dark-mode .token.operator,
+body.dark-mode .token.entity,
+body.dark-mode .token.url,
+.language-css .token.string,
+.style .token.string {
+    color: #d4d4d4;
+    background: none;
+}
+body.dark-mode .token.atrule,
+body.dark-mode .token.attr-value,
+body.dark-mode .token.keyword {
+    color: #569cd6;
+}
+body.dark-mode .token.function,
+body.dark-mode .token.class-name {
+    color: #dcdcaa;
+}
+body.dark-mode .token.regex,
+body.dark-mode .token.important,
+body.dark-mode .token.variable {
+    color: #9cdcfe;
+}

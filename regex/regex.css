@@ -170,9 +170,6 @@ body.dark-mode #matchInfo .no-matches {
 }
 
 @media screen and (max-width: 480px) {
-    h1 {
-        font-size: 1.5em;
-    }
     .container {
         padding: 10px;
     }

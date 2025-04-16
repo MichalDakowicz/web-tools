@@ -9,8 +9,6 @@
     </head>
     <body>
         <div class="container">
-            <h1>Text Manipulator</h1>
-
             <div class="textarea-group">
                 <label for="inputText">Input Text:</label>
                 <textarea
@@ -27,13 +25,19 @@
                 <button id="btnLowercase" title="Convert text to lowercase">
                     Lowercase
                 </button>
-                <button id="btnSentenceCase" title="Convert text to Sentence case.">
+                <button
+                    id="btnSentenceCase"
+                    title="Convert text to Sentence case."
+                >
                     Sentence Case
                 </button>
                 <button id="btnTitleCase" title="Convert Text To Title Case">
                     Title Case
                 </button>
-                 <button id="btnCapitalize" title="Capitalize First Letter Of Text">
+                <button
+                    id="btnCapitalize"
+                    title="Capitalize First Letter Of Text"
+                >
                     Capitalize
                 </button>
                 <button id="btnReverse" title="Reverse the entire text">
@@ -42,21 +46,31 @@
                 <button id="btnReverseWords" title="Reverse the order of words">
                     Reverse Words
                 </button>
-                 <button id="btnTrim" title="Remove leading/trailing whitespace">
+                <button id="btnTrim" title="Remove leading/trailing whitespace">
                     Trim Whitespace
                 </button>
-                <button id="btnClear" class="secondary-button" title="Clear input and output">Clear All</button>
+                <button
+                    id="btnClear"
+                    class="secondary-button"
+                    title="Clear input and output"
+                >
+                    Clear All
+                </button>
             </div>
 
             <div class="textarea-group output-group">
                 <label for="outputText">Output Text:</label>
-                 <textarea
+                <textarea
                     id="outputText"
                     placeholder="Result will appear here..."
                     rows="8"
                     readonly
                 ></textarea>
-                <button id="btnCopyOutput" class="copy-button" title="Copy output text to clipboard">
+                <button
+                    id="btnCopyOutput"
+                    class="copy-button"
+                    title="Copy output text to clipboard"
+                >
                     Copy
                 </button>
             </div>
@@ -66,7 +80,6 @@
                 <p>Words: <span id="wordCount">0</span></p>
                 <p>Lines: <span id="lineCount">0</span></p>
             </div>
-
         </div>
 
         <div id="darkMode">

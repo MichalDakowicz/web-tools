@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>JSON Formatter & Validator</title>
+        <link rel="stylesheet" href="../style.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+        />
+        <link rel="stylesheet" href="json.css" />
+    </head>
+    <body>
+        <div class="container json-tool-container">
+            <div class="formatter-grid">
+                <div class="editor-container">
+                    <label for="jsonInput">Input JSON:</label>
+                    <div class="editor-wrapper">
+                        <div id="inputLineNumbers" class="line-numbers">
+                            <div>1</div>
+                        </div>
+                        <textarea
+                            id="jsonInput"
+                            class="code-editor"
+                            placeholder="Paste your JSON data here..."
+                            spellcheck="false"
+                        ></textarea>
+                        <button
+                            id="clearButton"
+                            class="clear-textarea-button"
+                            title="Clear Input"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                </div>
+
+                <div class="editor-container">
+                    <label for="jsonOutputDisplay"
+                        >Formatted / Validated JSON:</label
+                    >
+                    <div class="editor-wrapper">
+                        <div id="outputLineNumbers" class="line-numbers">
+                            <div>1</div>
+                        </div>
+                        <pre
+                            id="jsonOutputDisplay"
+                            class="code-editor language-json"
+                            aria-live="polite"
+                        ><code id="jsonHighlightOutput" class="language-json"></code></pre>
+                        <textarea
+                            id="jsonOutput"
+                            style="display: none"
+                        ></textarea>
+                        <button
+                            id="copyButton"
+                            class="copy-button"
+                            title="Copy Output"
+                        >
+                            Copy
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls-status">
+                <button id="formatButton">Format / Validate</button>
+                <div id="statusMessage" class="status-box"></div>
+            </div>
+        </div>
+
+        <div id="darkMode">
+            <input type="checkbox" id="dark-mode-toggle" />
+            <b>Dark Mode</b>
+        </div>
+
+        <script src="../script.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+        <script src="json.js"></script>
+    </body>
+</html>
